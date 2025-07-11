@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import Navbar from './components/Navbar';
@@ -6,10 +6,23 @@ import Hero from './components/Hero';
 import PatternGenerator from './components/PatternGenerator';
 import Gallery from './components/Gallery';
 import Collaborate from './components/Collaborate';
+import UserProfile from './components/UserProfile';
+import TutorialOverlay from './components/TutorialOverlay';
 import Footer from './components/Footer';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
+  const [isFirstVisit, setIsFirstVisit] = useState(true);
+
+  useEffect(() => {
+    const hasVisited = localStorage.getItem('hasVisitedPatternPal');
+    if (!hasVisited) {
+      setIsFirstVisit(true);
+      localStorage.setItem('hasVisitedPatternPal', 'true');
+    } else {
+      setIsFirstVisit(false);
+    }
+  }, []);
 
   const pageVariants = {
     initial: { opacity: 0, y: 20 },
@@ -27,6 +40,11 @@ function App() {
     <Router>
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
         <Navbar currentPage={currentPage} setCurrentPage={setCurrentPage} />
+        
+        <TutorialOverlay 
+          isFirstVisit={isFirstVisit} 
+          onComplete={() => setIsFirstVisit(false)} 
+        />
         
         <AnimatePresence mode="wait">
           <Routes>
@@ -67,6 +85,19 @@ function App() {
                 transition={pageTransition}
               >
                 <Collaborate />
+              </motion.div>
+            } />
+
+            <Route path="/profile" element={
+              <motion.div
+                key="profile"
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                variants={pageVariants}
+                transition={pageTransition}
+              >
+                <UserProfile />
               </motion.div>
             } />
           </Routes>

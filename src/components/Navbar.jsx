@@ -4,7 +4,7 @@ import { Link, useLocation } from 'react-router-dom';
 import SafeIcon from '../common/SafeIcon';
 import * as FiIcons from 'react-icons/fi';
 
-const { FiGrid, FiImage, FiUsers, FiMenu, FiX } = FiIcons;
+const { FiGrid, FiImage, FiUsers, FiMenu, FiX, FiUser } = FiIcons;
 
 const Navbar = ({ currentPage, setCurrentPage }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -14,6 +14,7 @@ const Navbar = ({ currentPage, setCurrentPage }) => {
     { name: 'Generator', path: '/', icon: FiGrid },
     { name: 'Gallery', path: '/gallery', icon: FiImage },
     { name: 'Collaborate', path: '/collaborate', icon: FiUsers },
+    { name: 'Profile', path: '/profile', icon: FiUser }
   ];
 
   const isActive = (path) => {
