@@ -7,31 +7,26 @@ import * as FiIcons from 'react-icons/fi';
 const { FiEdit2, FiDownload, FiShare2, FiZap, FiLayers, FiPalette } = FiIcons;
 
 const Landing = () => {
-  // Beautiful floating pattern elements
+  // Create floating pattern elements
   const createFloatingElements = () => {
     const elements = [];
-    const patterns = [
-      // Geometric shapes
-      { type: 'circle', color: '#3B82F6' },
-      { type: 'triangle', color: '#8B5CF6' },
-      { type: 'hexagon', color: '#F59E0B' },
-      { type: 'diamond', color: '#EC4899' },
-      { type: 'star', color: '#10B981' },
-      { type: 'circle', color: '#EF4444' },
-    ];
-
+    const icons = [FiEdit2, FiLayers, FiPalette, FiShare2, FiDownload, FiZap];
+    
     for (let i = 0; i < 8; i++) {
-      const pattern = patterns[i % patterns.length];
+      const icon = icons[i % icons.length];
       elements.push({
         id: i,
-        type: pattern.type,
-        color: pattern.color,
+        icon,
         x: Math.random() * 100,
         y: Math.random() * 100,
-        size: 40 + Math.random() * 80,
+        size: 60 + Math.random() * 40,
         rotation: Math.random() * 360,
         duration: 15 + Math.random() * 10,
         delay: Math.random() * 5,
+        gradient: [
+          `hsl(${Math.random() * 360}, 70%, 50%)`,
+          `hsl(${Math.random() * 360}, 70%, 60%)`
+        ],
       });
     }
     return elements;
@@ -39,103 +34,9 @@ const Landing = () => {
 
   const floatingElements = createFloatingElements();
 
-  const PatternElement = ({ element }) => {
-    const { type, color, size, x, y, rotation, duration, delay } = element;
-
-    const renderShape = () => {
-      const baseClasses = "absolute transform-gpu";
-      const style = { 
-        width: size, 
-        height: size, 
-        backgroundColor: color + '40', // Semi-transparent
-        border: `2px solid ${color}60`,
-      };
-
-      switch (type) {
-        case 'circle':
-          return (
-            <div 
-              className={`${baseClasses} rounded-full`} 
-              style={style}
-            />
-          );
-        case 'triangle':
-          return (
-            <div 
-              className={`${baseClasses}`}
-              style={{
-                width: 0,
-                height: 0,
-                borderLeft: `${size/2}px solid transparent`,
-                borderRight: `${size/2}px solid transparent`,
-                borderBottom: `${size}px solid ${color}40`,
-              }}
-            />
-          );
-        case 'hexagon':
-          return (
-            <div 
-              className={`${baseClasses} hexagon`}
-              style={{
-                width: size,
-                height: size * 0.866,
-                backgroundColor: color + '40',
-                position: 'relative',
-              }}
-            >
-              <div 
-                className="absolute"
-                style={{
-                  width: 0,
-                  height: 0,
-                  borderLeft: `${size/2}px solid transparent`,
-                  borderRight: `${size/2}px solid transparent`,
-                  borderBottom: `${size * 0.289}px solid ${color}40`,
-                  top: `-${size * 0.289}px`,
-                }}
-              />
-              <div 
-                className="absolute"
-                style={{
-                  width: 0,
-                  height: 0,
-                  borderLeft: `${size/2}px solid transparent`,
-                  borderRight: `${size/2}px solid transparent`,
-                  borderTop: `${size * 0.289}px solid ${color}40`,
-                  bottom: `-${size * 0.289}px`,
-                }}
-              />
-            </div>
-          );
-        case 'diamond':
-          return (
-            <div 
-              className={`${baseClasses} transform rotate-45`}
-              style={style}
-            />
-          );
-        case 'star':
-          return (
-            <div 
-              className={`${baseClasses} star`}
-              style={{
-                width: size,
-                height: size,
-                background: `conic-gradient(from 0deg, ${color}40, ${color}80, ${color}40)`,
-                clipPath: 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)',
-              }}
-            />
-          );
-        default:
-          return (
-            <div 
-              className={`${baseClasses} rounded-lg`} 
-              style={style}
-            />
-          );
-      }
-    };
-
+  const PatternIcon = ({ element }) => {
+    const { icon, size, x, y, rotation, duration, delay, gradient } = element;
+    
     return (
       <motion.div
         className="absolute pointer-events-none"
@@ -160,17 +61,30 @@ const Landing = () => {
           delay: delay,
         }}
       >
-        {renderShape()}
+        <div
+          className="rounded-xl flex items-center justify-center"
+          style={{
+            width: size,
+            height: size,
+            background: `linear-gradient(145deg, ${gradient[0]}, ${gradient[1]})`,
+            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+          }}
+        >
+          <SafeIcon
+            icon={icon}
+            className="w-1/2 h-1/2 text-white"
+          />
+        </div>
       </motion.div>
     );
   };
 
   return (
     <div className="relative min-h-screen overflow-hidden">
-      {/* Beautiful Floating Pattern Elements */}
+      {/* Floating Pattern Icons */}
       <div className="absolute inset-0 overflow-hidden">
         {floatingElements.map((element) => (
-          <PatternElement key={element.id} element={element} />
+          <PatternIcon key={element.id} element={element} />
         ))}
       </div>
 
@@ -192,12 +106,10 @@ const Landing = () => {
                 in Seconds
               </span>
             </h1>
-            
             <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto mb-12 leading-relaxed">
-              Generate unique, beautiful patterns for your designs using our AI-powered pattern generator. 
+              Generate unique, beautiful patterns for your designs using our AI-powered pattern generator.
               Perfect for designers, developers, and creative professionals.
             </p>
-
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Link to="/editor">
                 <motion.button
@@ -208,7 +120,6 @@ const Landing = () => {
                   Start Creating
                 </motion.button>
               </Link>
-              
               <Link to="/gallery">
                 <motion.button
                   whileHover={{ scale: 1.05, y: -2 }}
@@ -254,8 +165,7 @@ const Landing = () => {
               Lightning Fast
             </h3>
             <p className="text-gray-600 leading-relaxed">
-              Generate complex patterns instantly with our optimized algorithms. 
-              Real-time preview and instant feedback for rapid iteration.
+              Generate complex patterns instantly with our optimized algorithms. Real-time preview and instant feedback for rapid iteration.
             </p>
           </motion.div>
 
@@ -273,8 +183,7 @@ const Landing = () => {
               Multiple Styles
             </h3>
             <p className="text-gray-600 leading-relaxed">
-              Choose from geometric, organic, and abstract pattern styles. 
-              Each style offers unique customization options and creative possibilities.
+              Choose from geometric, organic, and abstract pattern styles. Each style offers unique customization options and creative possibilities.
             </p>
           </motion.div>
 
@@ -292,8 +201,7 @@ const Landing = () => {
               Custom Colors
             </h3>
             <p className="text-gray-600 leading-relaxed">
-              Fine-tune every aspect of your patterns with advanced color controls. 
-              Create harmonious palettes that match your brand perfectly.
+              Fine-tune every aspect of your patterns with advanced color controls. Create harmonious palettes that match your brand perfectly.
             </p>
           </motion.div>
         </div>
@@ -307,14 +215,6 @@ const Landing = () => {
           transition={{ duration: 0.8, delay: 0.6 }}
           className="bg-gradient-to-r from-primary-600 via-purple-600 to-pink-600 rounded-3xl p-12 text-center text-white relative overflow-hidden"
         >
-          {/* Background pattern overlay */}
-          <div className="absolute inset-0 opacity-10">
-            <div className="absolute top-4 left-4 w-8 h-8 border-2 border-white rounded-full"></div>
-            <div className="absolute top-8 right-12 w-6 h-6 border-2 border-white transform rotate-45"></div>
-            <div className="absolute bottom-8 left-12 w-10 h-10 border-2 border-white rounded-full"></div>
-            <div className="absolute bottom-4 right-4 w-8 h-8 border-2 border-white transform rotate-45"></div>
-          </div>
-          
           <div className="relative z-10">
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
               Ready to create something amazing?
