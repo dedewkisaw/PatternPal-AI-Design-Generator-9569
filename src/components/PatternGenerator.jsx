@@ -3,13 +3,23 @@ import { motion, AnimatePresence } from 'framer-motion';
 import SafeIcon from '../common/SafeIcon';
 import * as FiIcons from 'react-icons/fi';
 
-const { FiSliders, FiDownload, FiRefreshCcw, FiChevronDown, FiPalette } = FiIcons;
+const { FiSliders, FiDownload, FiRefreshCcw, FiChevronDown, FiPalette, FiMessageSquare, FiCpu, FiSend, FiLoader, FiZap } = FiIcons;
 
 const PatternGenerator = () => {
   const canvasRef = useRef(null);
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [selectedColorIndex, setSelectedColorIndex] = useState(0);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [prompt, setPrompt] = useState('');
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generatedPrompts, setGeneratedPrompts] = useState([]);
+  const [promptSuggestions, setPromptSuggestions] = useState([
+    "Abstract waves with blue and purple",
+    "Geometric mountains at sunset",
+    "Organic floral pattern with pastel colors",
+    "Tech-inspired circuit board design",
+    "Tropical leaves with vibrant greens"
+  ]);
   const [settings, setSettings] = useState({
     scale: 1,
     complexity: 6,
@@ -61,6 +71,117 @@ const PatternGenerator = () => {
     
     // Draw pattern based on selected style
     patternStyles[settings.style](ctx, rect.width, rect.height, settings);
+  };
+
+  const handlePromptSubmit = (e) => {
+    e.preventDefault();
+    if (!prompt.trim()) return;
+    
+    setIsGenerating(true);
+    
+    // Store the prompt in history
+    setGeneratedPrompts(prev => [prompt, ...prev.slice(0, 4)]);
+
+    // Simulate AI processing
+    setTimeout(() => {
+      // Generate pattern based on prompt
+      const newSettings = processPrompt(prompt);
+      setSettings(newSettings);
+      setIsGenerating(false);
+      setPrompt('');
+    }, 1500);
+  };
+
+  // Process prompt to generate pattern settings
+  const processPrompt = (promptText) => {
+    // This is a simplified simulation of AI pattern generation
+    // In a real implementation, this would call an API
+    
+    const lowercasePrompt = promptText.toLowerCase();
+    const newSettings = { ...settings };
+    
+    // Determine style based on keywords
+    if (lowercasePrompt.includes('geometric') || lowercasePrompt.includes('shape') || lowercasePrompt.includes('polygon')) {
+      newSettings.style = 'geometric';
+    } else if (lowercasePrompt.includes('organic') || lowercasePrompt.includes('natural') || lowercasePrompt.includes('flow')) {
+      newSettings.style = 'organic';
+    } else if (lowercasePrompt.includes('abstract') || lowercasePrompt.includes('chaos') || lowercasePrompt.includes('random')) {
+      newSettings.style = 'abstract';
+    }
+    
+    // Adjust complexity based on keywords
+    if (lowercasePrompt.includes('simple') || lowercasePrompt.includes('minimal')) {
+      newSettings.complexity = 3 + Math.floor(Math.random() * 3);
+    } else if (lowercasePrompt.includes('complex') || lowercasePrompt.includes('detailed')) {
+      newSettings.complexity = 8 + Math.floor(Math.random() * 4);
+    } else {
+      newSettings.complexity = 4 + Math.floor(Math.random() * 6);
+    }
+    
+    // Adjust rotation
+    if (lowercasePrompt.includes('straight') || lowercasePrompt.includes('aligned')) {
+      newSettings.rotation = Math.floor(Math.random() * 10);
+    } else if (lowercasePrompt.includes('diagonal') || lowercasePrompt.includes('tilted')) {
+      newSettings.rotation = 30 + Math.floor(Math.random() * 30);
+    } else if (lowercasePrompt.includes('rotate') || lowercasePrompt.includes('circular')) {
+      newSettings.rotation = Math.floor(Math.random() * 360);
+    }
+    
+    // Extract colors
+    const colorWords = [
+      { name: 'blue', hex: '#3B82F6' },
+      { name: 'purple', hex: '#8B5CF6' },
+      { name: 'orange', hex: '#F59E0B' },
+      { name: 'pink', hex: '#EC4899' },
+      { name: 'green', hex: '#10B981' },
+      { name: 'red', hex: '#EF4444' },
+      { name: 'indigo', hex: '#6366F1' },
+      { name: 'yellow', hex: '#FBBF24' },
+      { name: 'teal', hex: '#14B8A6' },
+      { name: 'cyan', hex: '#06B6D4' },
+      { name: 'brown', hex: '#8B5A2B' },
+      { name: 'gray', hex: '#71717A' },
+      { name: 'black', hex: '#1E1E1E' },
+      { name: 'white', hex: '#FFFFFF' }
+    ];
+    
+    const foundColors = colorWords.filter(color => 
+      lowercasePrompt.includes(color.name)
+    ).map(color => color.hex);
+    
+    if (foundColors.length > 0) {
+      // If colors are found in the prompt, use them
+      newSettings.colors = foundColors.length >= 2 ? 
+        foundColors : 
+        [foundColors[0], ...predefinedColors.slice(0, 3)];
+    } else {
+      // Otherwise choose random colors
+      const randomColors = [];
+      for (let i = 0; i < 4; i++) {
+        randomColors.push(predefinedColors[Math.floor(Math.random() * predefinedColors.length)]);
+      }
+      newSettings.colors = randomColors;
+    }
+    
+    // Adjust scale based on keywords
+    if (lowercasePrompt.includes('small') || lowercasePrompt.includes('tiny')) {
+      newSettings.scale = 0.5 + Math.random() * 0.5;
+    } else if (lowercasePrompt.includes('large') || lowercasePrompt.includes('big')) {
+      newSettings.scale = 1.5 + Math.random() * 0.5;
+    } else {
+      newSettings.scale = 0.8 + Math.random() * 0.8;
+    }
+    
+    // Adjust noise based on keywords
+    if (lowercasePrompt.includes('clean') || lowercasePrompt.includes('precise')) {
+      newSettings.noise = 0.05 + Math.random() * 0.1;
+    } else if (lowercasePrompt.includes('messy') || lowercasePrompt.includes('chaotic')) {
+      newSettings.noise = 0.3 + Math.random() * 0.3;
+    } else {
+      newSettings.noise = 0.1 + Math.random() * 0.2;
+    }
+    
+    return newSettings;
   };
 
   const handleDownload = () => {
@@ -328,8 +449,97 @@ const PatternGenerator = () => {
     }
   }
 
+  const fadeInUpVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      {/* AI Prompt Input Section */}
+      <motion.div 
+        variants={fadeInUpVariants}
+        initial="hidden"
+        animate="visible"
+        className="neu-card mb-8"
+      >
+        <div className="flex items-center mb-4">
+          <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center mr-4">
+            <SafeIcon icon={FiCpu} className="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <h3 className="text-xl font-semibold text-gray-900">AI Pattern Generator</h3>
+            <p className="text-gray-600">Describe the pattern you want to create</p>
+          </div>
+        </div>
+        
+        <form onSubmit={handlePromptSubmit} className="mb-4">
+          <div className="relative">
+            <input
+              type="text"
+              className="w-full px-4 py-3 pr-12 neu-input text-gray-800 placeholder-gray-500"
+              placeholder="e.g. Abstract waves with blue and purple colors..."
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+              disabled={isGenerating}
+            />
+            <button
+              type="submit"
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full text-white disabled:opacity-50"
+              disabled={isGenerating || !prompt.trim()}
+            >
+              {isGenerating ? (
+                <SafeIcon icon={FiLoader} className="w-5 h-5 animate-spin" />
+              ) : (
+                <SafeIcon icon={FiSend} className="w-5 h-5" />
+              )}
+            </button>
+          </div>
+        </form>
+        
+        {/* Prompt Suggestions */}
+        <div className="mb-2">
+          <p className="text-sm font-medium text-gray-700 mb-2">Try these prompts:</p>
+          <div className="flex flex-wrap gap-2">
+            {promptSuggestions.map((suggestion, index) => (
+              <motion.button
+                key={index}
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.98 }}
+                className="px-3 py-1 bg-neu-gradient shadow-neu-flat-sm hover:shadow-neu-button text-sm text-gray-700 rounded-lg"
+                onClick={() => setPrompt(suggestion)}
+                disabled={isGenerating}
+              >
+                {suggestion}
+              </motion.button>
+            ))}
+          </div>
+        </div>
+        
+        {/* Recent Prompts */}
+        {generatedPrompts.length > 0 && (
+          <div>
+            <p className="text-sm font-medium text-gray-700 mb-2">Recent prompts:</p>
+            <div className="flex flex-wrap gap-2">
+              {generatedPrompts.map((genPrompt, index) => (
+                <motion.button
+                  key={index}
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="px-3 py-1 bg-white shadow-neu-flat-sm hover:shadow-neu-button text-sm text-gray-700 rounded-lg flex items-center"
+                  onClick={() => setPrompt(genPrompt)}
+                  disabled={isGenerating}
+                >
+                  <SafeIcon icon={FiMessageSquare} className="w-3 h-3 mr-1 text-blue-500" />
+                  {genPrompt.length > 30 ? `${genPrompt.substring(0, 30)}...` : genPrompt}
+                </motion.button>
+              ))}
+            </div>
+          </div>
+        )}
+      </motion.div>
+      
+      {/* Pattern Generator UI */}
       <div className="neu-card">
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-2xl font-bold text-gray-900">Pattern Generator</h2>
@@ -464,6 +674,22 @@ const PatternGenerator = () => {
                     max="360"
                     value={settings.rotation}
                     onChange={(e) => setSettings({ ...settings, rotation: Number(e.target.value) })}
+                    className="w-full h-2 rounded-full appearance-none cursor-pointer slider"
+                  />
+                </div>
+
+                {/* Noise/Randomness */}
+                <div className="mb-6">
+                  <label className="block text-sm font-medium text-gray-700 mb-3">
+                    Randomness ({(settings.noise * 100).toFixed(0)}%)
+                  </label>
+                  <input
+                    type="range"
+                    min="0"
+                    max="0.6"
+                    step="0.05"
+                    value={settings.noise}
+                    onChange={(e) => setSettings({ ...settings, noise: Number(e.target.value) })}
                     className="w-full h-2 rounded-full appearance-none cursor-pointer slider"
                   />
                 </div>
