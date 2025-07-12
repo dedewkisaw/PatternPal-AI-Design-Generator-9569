@@ -14,14 +14,13 @@ const Editor = () => {
   const [isShared, setIsShared] = useState(false);
   const patternRef = useRef(null);
   const [savedPatterns, setSavedPatterns] = useState([]);
-  
+
   const handleExport = async (format, settings) => {
     if (!patternRef.current) return;
     
     try {
       // Get the canvas element from the PatternGenerator
       const canvas = patternRef.current.querySelector('canvas');
-      
       if (!canvas) {
         console.error("Canvas not found");
         return;
@@ -35,8 +34,7 @@ const Editor = () => {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-      } 
-      else if (format === 'svg') {
+      } else if (format === 'svg') {
         // Convert canvas to SVG (simplified approach)
         const svgData = `
           <svg xmlns="http://www.w3.org/2000/svg" width="${canvas.width}" height="${canvas.height}">
@@ -46,7 +44,6 @@ const Editor = () => {
         
         const blob = new Blob([svgData], { type: 'image/svg+xml' });
         const url = URL.createObjectURL(blob);
-        
         const link = document.createElement('a');
         link.download = `pattern-${Date.now()}.svg`;
         link.href = url;
@@ -63,7 +60,7 @@ const Editor = () => {
       return false;
     }
   };
-  
+
   const handleSave = () => {
     if (!patternRef.current) return;
     
@@ -92,7 +89,7 @@ const Editor = () => {
       console.error("Error saving pattern:", error);
     }
   };
-  
+
   const handleShare = () => {
     // Show the export modal which also handles sharing
     setShowExportModal(true);
@@ -101,17 +98,22 @@ const Editor = () => {
   };
 
   return (
-    <div className="min-h-screen pt-20 pb-16">
+    <div className="min-h-screen pt-20 pb-16 bg-neugray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Editor Header */}
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Pattern Editor</h1>
+          <h1 className="text-3xl font-bold text-gray-900 flex items-center">
+            <div className="neu-icon-container mr-3">
+              <SafeIcon icon={FiIcons.FiEdit2} className="w-5 h-5 text-primary-600" />
+            </div>
+            Pattern Editor
+          </h1>
           
-          <div className="flex space-x-4">
+          <div className="flex space-x-4 save-section">
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="flex items-center space-x-2 px-4 py-2 bg-neu-gradient shadow-neu-flat hover:shadow-neu-pressed rounded-lg transition-all duration-200"
+              className="flex items-center space-x-2 px-4 py-3 neu-button"
               onClick={() => setShowExportModal(true)}
             >
               <SafeIcon icon={FiDownload} className="w-4 h-4" />
@@ -121,7 +123,7 @@ const Editor = () => {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="flex items-center space-x-2 px-4 py-2 bg-neu-gradient shadow-neu-flat hover:shadow-neu-pressed rounded-lg transition-all duration-200"
+              className="flex items-center space-x-2 px-4 py-3 neu-button"
               onClick={handleSave}
             >
               <SafeIcon icon={isSaved ? FiCheck : FiSave} className="w-4 h-4" />
@@ -131,7 +133,7 @@ const Editor = () => {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="flex items-center space-x-2 px-4 py-2 bg-neu-gradient shadow-neu-flat hover:shadow-neu-pressed rounded-lg transition-all duration-200"
+              className="flex items-center space-x-2 px-4 py-3 neu-button"
               onClick={handleShare}
             >
               <SafeIcon icon={isShared ? FiCheck : FiShare2} className="w-4 h-4" />
@@ -139,12 +141,12 @@ const Editor = () => {
             </motion.button>
           </div>
         </div>
-
+        
         {/* Pattern Generator */}
-        <div className="bg-white rounded-2xl shadow-neu-flat p-6" ref={patternRef}>
+        <div className="neu-card" ref={patternRef}>
           <PatternGenerator />
         </div>
-
+        
         {/* Export Modal */}
         {showExportModal && (
           <motion.div
@@ -157,21 +159,24 @@ const Editor = () => {
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white rounded-2xl shadow-neu-flat p-6 max-w-md w-full mx-4"
+              className="bg-neu-gradient rounded-neu shadow-neu-card p-8 max-w-md w-full mx-4"
             >
-              <div className="flex justify-between items-center mb-4">
+              <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-bold text-gray-900">Export Pattern</h2>
-                <motion.button 
-                  whileHover={{ scale: 1.1 }} 
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                   onClick={() => setShowExportModal(false)}
-                  className="p-2 rounded-full hover:bg-gray-100"
+                  className="p-2 rounded-full bg-neu-gradient shadow-neu-flat-sm hover:shadow-neu-button"
                 >
                   <SafeIcon icon={FiIcons.FiX} className="w-5 h-5" />
                 </motion.button>
               </div>
               
-              <ExportOptions onExport={handleExport} onClose={() => setShowExportModal(false)} />
+              <ExportOptions
+                onExport={handleExport}
+                onClose={() => setShowExportModal(false)}
+              />
             </motion.div>
           </motion.div>
         )}

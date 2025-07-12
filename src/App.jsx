@@ -22,7 +22,7 @@ const AppContent = () => {
     else if (path === '/editor') setCurrentPage('editor');
     else if (path === '/gallery') setCurrentPage('gallery');
     else if (path === '/profile') setCurrentPage('profile');
-    
+
     // Check if we should show tutorial (only when directly navigating to editor)
     if (path === '/editor') {
       const hasSeenTutorial = localStorage.getItem('hasSeenPatternPalTutorial');
@@ -50,7 +50,7 @@ const AppContent = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
+    <div className="min-h-screen bg-neugray-50">
       <Navbar currentPage={currentPage} setCurrentPage={setCurrentPage} />
       
       {showTutorial && (
@@ -59,69 +59,57 @@ const AppContent = () => {
       
       <AnimatePresence mode="wait">
         <Routes>
-          <Route 
-            path="/" 
-            element={
-              <motion.div 
-                key="home" 
-                initial="initial" 
-                animate="animate" 
-                exit="exit" 
-                variants={pageVariants} 
-                transition={pageTransition}
-              >
-                <Landing />
-              </motion.div>
-            } 
-          />
+          <Route path="/" element={
+            <motion.div
+              key="home"
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              variants={pageVariants}
+              transition={pageTransition}
+            >
+              <Landing />
+            </motion.div>
+          } />
           
-          <Route 
-            path="/editor" 
-            element={
-              <motion.div 
-                key="editor" 
-                initial="initial" 
-                animate="animate" 
-                exit="exit" 
-                variants={pageVariants} 
-                transition={pageTransition}
-              >
-                <Editor />
-              </motion.div>
-            } 
-          />
+          <Route path="/editor" element={
+            <motion.div
+              key="editor"
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              variants={pageVariants}
+              transition={pageTransition}
+            >
+              <Editor />
+            </motion.div>
+          } />
           
-          <Route 
-            path="/gallery" 
-            element={
-              <motion.div 
-                key="gallery" 
-                initial="initial" 
-                animate="animate" 
-                exit="exit" 
-                variants={pageVariants} 
-                transition={pageTransition}
-              >
-                <Gallery />
-              </motion.div>
-            } 
-          />
+          <Route path="/gallery" element={
+            <motion.div
+              key="gallery"
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              variants={pageVariants}
+              transition={pageTransition}
+            >
+              <Gallery />
+            </motion.div>
+          } />
           
-          <Route 
-            path="/profile" 
-            element={
-              <motion.div 
-                key="profile" 
-                initial="initial" 
-                animate="animate" 
-                exit="exit" 
-                variants={pageVariants} 
-                transition={pageTransition}
-              >
-                <UserProfile />
-              </motion.div>
-            } 
-          />
+          <Route path="/profile" element={
+            <motion.div
+              key="profile"
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              variants={pageVariants}
+              transition={pageTransition}
+            >
+              <UserProfile />
+            </motion.div>
+          } />
         </Routes>
       </AnimatePresence>
       

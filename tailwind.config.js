@@ -33,14 +33,25 @@ export default {
         }
       },
       boxShadow: {
-        'neu-flat': '-8px -8px 16px 0 rgba(255,255,255,0.6), 8px 8px 16px 0 rgba(0,0,0,0.1)',
-        'neu-pressed': 'inset -8px -8px 16px 0 rgba(255,255,255,0.6), inset 8px 8px 16px 0 rgba(0,0,0,0.1)',
-        'neu-flat-sm': '-4px -4px 8px 0 rgba(255,255,255,0.6), 4px 4px 8px 0 rgba(0,0,0,0.1)',
-        'neu-pressed-sm': 'inset -4px -4px 8px 0 rgba(255,255,255,0.6), inset 4px 4px 8px 0 rgba(0,0,0,0.1)',
+        'neu-flat': '-8px -8px 16px 0 rgba(255,255,255,0.8), 8px 8px 16px 0 rgba(0,0,0,0.15)',
+        'neu-pressed': 'inset -4px -4px 8px 0 rgba(255,255,255,0.7), inset 4px 4px 8px 0 rgba(0,0,0,0.15)',
+        'neu-flat-sm': '-4px -4px 8px 0 rgba(255,255,255,0.8), 4px 4px 8px 0 rgba(0,0,0,0.15)',
+        'neu-pressed-sm': 'inset -2px -2px 5px 0 rgba(255,255,255,0.7), inset 2px 2px 5px 0 rgba(0,0,0,0.15)',
+        'neu-ring': '0 0 0 3px rgba(226, 232, 240, 0.5), -3px -3px 6px 0 rgba(255,255,255,0.8), 3px 3px 6px 0 rgba(0,0,0,0.15)',
+        'neu-button': '-5px -5px 10px 0 rgba(255,255,255,0.8), 5px 5px 10px 0 rgba(0,0,0,0.15)',
+        'neu-button-pressed': 'inset -3px -3px 6px 0 rgba(255,255,255,0.7), inset 3px 3px 6px 0 rgba(0,0,0,0.15)',
+        'neu-card': '-10px -10px 20px 0 rgba(255,255,255,0.8), 10px 10px 20px 0 rgba(0,0,0,0.15)',
       },
       backgroundImage: {
         'neu-gradient': 'linear-gradient(145deg, #e6e7eb, #ffffff)',
         'neu-gradient-pressed': 'linear-gradient(145deg, #d5d7db, #e6e7eb)',
+        'neu-primary': 'linear-gradient(145deg, #0284c7, #38bdf8)',
+        'neu-primary-pressed': 'linear-gradient(145deg, #0369a1, #0284c7)',
+      },
+      borderRadius: {
+        'neu': '16px',
+        'neu-sm': '12px',
+        'neu-lg': '24px',
       }
     },
   },

@@ -32,9 +32,11 @@ const PatternGenerator = () => {
   ];
 
   const predefinedColors = [
-    '#3B82F6', '#8B5CF6', '#F59E0B', '#EC4899', '#10B981', '#EF4444',
-    '#6366F1', '#F97316', '#84CC16', '#06B6D4', '#8B5A2B', '#DC2626',
-    '#7C3AED', '#059669', '#B91C1C', '#7C2D12', '#1E40AF', '#BE185D'
+    '#3B82F6', '#8B5CF6', '#F59E0B', '#EC4899', 
+    '#10B981', '#EF4444', '#6366F1', '#F97316', 
+    '#84CC16', '#06B6D4', '#8B5A2B', '#DC2626', 
+    '#7C3AED', '#059669', '#B91C1C', '#7C2D12', 
+    '#1E40AF', '#BE185D'
   ];
 
   useEffect(() => {
@@ -47,7 +49,7 @@ const PatternGenerator = () => {
     
     const ctx = canvas.getContext('2d');
     const dpr = window.devicePixelRatio || 1;
-
+    
     // Set canvas size with high DPI support
     const rect = canvas.getBoundingClientRect();
     canvas.width = rect.width * dpr;
@@ -56,7 +58,7 @@ const PatternGenerator = () => {
     
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
+    
     // Draw pattern based on selected style
     patternStyles[settings.style](ctx, rect.width, rect.height, settings);
   };
@@ -83,30 +85,28 @@ const PatternGenerator = () => {
   function drawGeometricPattern(ctx, width, height, settings) {
     const { scale, complexity, rotation, noise, colors } = settings;
     const cellSize = 40 * scale;
-    
     const gridOffset = {
       x: (width % cellSize) / 2,
       y: (height % cellSize) / 2
     };
-
+    
     ctx.lineWidth = 2;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
-
+    
     for (let x = gridOffset.x; x < width; x += cellSize) {
       for (let y = gridOffset.y; y < height; y += cellSize) {
         const noiseValue = Math.random() * noise;
         const colorIndex = Math.floor(Math.random() * colors.length);
-        
         ctx.fillStyle = colors[colorIndex];
         ctx.strokeStyle = colors[(colorIndex + 1) % colors.length];
         
         ctx.save();
         ctx.translate(x + cellSize/2, y + cellSize/2);
         ctx.rotate((rotation + noiseValue * 360) * Math.PI / 180);
-
+        
         const shapeComplexity = Math.floor(Math.random() * complexity) + 3;
-
+        
         switch(Math.floor(Math.random() * 6)) {
           case 0: // Mandala
             for (let i = 0; i < shapeComplexity; i++) {
@@ -164,7 +164,7 @@ const PatternGenerator = () => {
     ctx.lineWidth = 3;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
-
+    
     for (let x = 0; x < width; x += cellSize) {
       for (let y = 0; y < height; y += cellSize) {
         const colorIndex = Math.floor(Math.random() * colors.length);
@@ -174,7 +174,7 @@ const PatternGenerator = () => {
         ctx.save();
         ctx.translate(x + cellSize/2, y + cellSize/2);
         ctx.rotate((rotation + Math.random() * noise * 360) * Math.PI / 180);
-
+        
         // Organic shapes
         switch(Math.floor(Math.random() * 4)) {
           case 0: // Blob
@@ -184,6 +184,7 @@ const PatternGenerator = () => {
               const radius = (cellSize/3) * (0.7 + Math.random() * 0.6);
               const x = Math.cos(angle) * radius;
               const y = Math.sin(angle) * radius;
+              
               if (i === 0) {
                 ctx.moveTo(x, y);
               } else {
@@ -191,8 +192,10 @@ const PatternGenerator = () => {
                 const prevRadius = (cellSize/3) * (0.7 + Math.random() * 0.6);
                 const prevX = Math.cos(prevAngle) * prevRadius;
                 const prevY = Math.sin(prevAngle) * prevRadius;
+                
                 const cpX = (prevX + x) / 2 + (Math.random() - 0.5) * 10;
                 const cpY = (prevY + y) / 2 + (Math.random() - 0.5) * 10;
+                
                 ctx.quadraticCurveTo(cpX, cpY, x, y);
               }
             }
@@ -205,6 +208,7 @@ const PatternGenerator = () => {
             ctx.beginPath();
             ctx.ellipse(0, 0, cellSize/4, cellSize/2, 0, 0, 2 * Math.PI);
             ctx.fill();
+            
             ctx.beginPath();
             ctx.moveTo(0, -cellSize/2);
             ctx.quadraticCurveTo(cellSize/8, 0, 0, cellSize/2);
@@ -245,14 +249,14 @@ const PatternGenerator = () => {
     ctx.lineWidth = 4;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
-
+    
     // Background gradient
     const gradient = ctx.createLinearGradient(0, 0, width, height);
     gradient.addColorStop(0, colors[0] + '20');
     gradient.addColorStop(1, colors[1] + '20');
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, width, height);
-
+    
     const numElements = complexity * 5;
     
     for (let i = 0; i < numElements; i++) {
@@ -267,7 +271,7 @@ const PatternGenerator = () => {
       
       ctx.fillStyle = colors[colorIndex] + Math.floor(50 + Math.random() * 100).toString(16);
       ctx.strokeStyle = colors[(colorIndex + 1) % colors.length];
-
+      
       switch(Math.floor(Math.random() * 5)) {
         case 0: // Abstract stroke
           ctx.beginPath();
@@ -326,24 +330,25 @@ const PatternGenerator = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div className="bg-white rounded-2xl shadow-neu-flat p-6">
-        <div className="flex justify-between items-center mb-6">
+      <div className="neu-card">
+        <div className="flex justify-between items-center mb-8">
           <h2 className="text-2xl font-bold text-gray-900">Pattern Generator</h2>
-          <div className="flex space-x-3">
+          <div className="flex space-x-4">
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={generatePattern}
-              className="flex items-center space-x-2 px-4 py-2 bg-neu-gradient shadow-neu-flat hover:shadow-neu-pressed active:shadow-neu-pressed rounded-lg transition-all duration-200"
+              className="flex items-center space-x-2 px-4 py-3 neu-button"
             >
               <SafeIcon icon={FiRefreshCcw} className="w-4 h-4" />
               <span>Generate</span>
             </motion.button>
+            
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={handleDownload}
-              className="flex items-center space-x-2 px-4 py-2 bg-neu-gradient shadow-neu-flat hover:shadow-neu-pressed active:shadow-neu-pressed rounded-lg transition-all duration-200"
+              className="flex items-center space-x-2 px-4 py-3 neu-button"
             >
               <SafeIcon icon={FiDownload} className="w-4 h-4" />
               <span>Download</span>
@@ -351,32 +356,34 @@ const PatternGenerator = () => {
           </div>
         </div>
         
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
-            <canvas
-              ref={canvasRef}
-              className="w-full h-[500px] rounded-xl shadow-neu-flat"
+            <canvas 
+              ref={canvasRef} 
+              className="w-full h-[500px] rounded-neu shadow-neu-flat" 
               style={{ background: '#fff' }}
             />
           </div>
           
           <div className="space-y-6">
-            <div className="bg-neu-gradient rounded-xl p-4 shadow-neu-flat">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                <SafeIcon icon={FiSliders} className="w-5 h-5 mr-2" />
+            <div className="bg-neu-gradient rounded-neu p-6 shadow-neu-flat">
+              <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
+                <div className="neu-icon-container mr-3">
+                  <SafeIcon icon={FiSliders} className="w-5 h-5 text-primary-600" />
+                </div>
                 Pattern Settings
               </h3>
               
               {/* Pattern Style - Neumorphic Dropdown */}
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+              <div className="mb-6 style-section">
+                <label className="block text-sm font-medium text-gray-700 mb-3">
                   Style
                 </label>
                 <div className="relative">
                   <motion.button
                     whileTap={{ scale: 0.98 }}
                     onClick={() => setDropdownOpen(!dropdownOpen)}
-                    className="w-full px-4 py-2 bg-neu-gradient shadow-neu-flat hover:shadow-neu-pressed rounded-lg text-left flex items-center justify-between transition-all duration-200"
+                    className="w-full px-4 py-3 neu-button flex items-center justify-between"
                   >
                     <span>{styleOptions.find(opt => opt.value === settings.style)?.label}</span>
                     <motion.div
@@ -393,7 +400,7 @@ const PatternGenerator = () => {
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
-                        className="absolute top-full left-0 right-0 mt-2 bg-neu-gradient rounded-lg shadow-neu-flat z-10 overflow-hidden"
+                        className="absolute top-full left-0 right-0 mt-2 bg-neu-gradient rounded-neu shadow-neu-flat z-10 overflow-hidden"
                       >
                         {styleOptions.map((option) => (
                           <motion.button
@@ -403,7 +410,7 @@ const PatternGenerator = () => {
                               setSettings({ ...settings, style: option.value });
                               setDropdownOpen(false);
                             }}
-                            className="w-full px-4 py-2 text-left hover:shadow-neu-pressed transition-all duration-200"
+                            className="w-full px-4 py-3 text-left hover:shadow-neu-pressed-sm transition-all duration-200"
                           >
                             {option.label}
                           </motion.button>
@@ -414,64 +421,66 @@ const PatternGenerator = () => {
                 </div>
               </div>
               
-              {/* Complexity */}
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Complexity ({settings.complexity})
-                </label>
-                <input
-                  type="range"
-                  min="3"
-                  max="12"
-                  value={settings.complexity}
-                  onChange={(e) => setSettings({ ...settings, complexity: Number(e.target.value) })}
-                  className="w-full h-2 bg-white rounded-lg appearance-none cursor-pointer shadow-neu-pressed slider"
-                />
-              </div>
-              
-              {/* Scale */}
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Scale ({settings.scale.toFixed(1)})
-                </label>
-                <input
-                  type="range"
-                  min="0.5"
-                  max="2"
-                  step="0.1"
-                  value={settings.scale}
-                  onChange={(e) => setSettings({ ...settings, scale: Number(e.target.value) })}
-                  className="w-full h-2 bg-white rounded-lg appearance-none cursor-pointer shadow-neu-pressed slider"
-                />
-              </div>
-              
-              {/* Rotation */}
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Rotation ({settings.rotation}°)
-                </label>
-                <input
-                  type="range"
-                  min="0"
-                  max="360"
-                  value={settings.rotation}
-                  onChange={(e) => setSettings({ ...settings, rotation: Number(e.target.value) })}
-                  className="w-full h-2 bg-white rounded-lg appearance-none cursor-pointer shadow-neu-pressed slider"
-                />
+              <div className="settings-section">
+                {/* Complexity */}
+                <div className="mb-6">
+                  <label className="block text-sm font-medium text-gray-700 mb-3">
+                    Complexity ({settings.complexity})
+                  </label>
+                  <input
+                    type="range"
+                    min="3"
+                    max="12"
+                    value={settings.complexity}
+                    onChange={(e) => setSettings({ ...settings, complexity: Number(e.target.value) })}
+                    className="w-full h-2 rounded-full appearance-none cursor-pointer slider"
+                  />
+                </div>
+                
+                {/* Scale */}
+                <div className="mb-6">
+                  <label className="block text-sm font-medium text-gray-700 mb-3">
+                    Scale ({settings.scale.toFixed(1)})
+                  </label>
+                  <input
+                    type="range"
+                    min="0.5"
+                    max="2"
+                    step="0.1"
+                    value={settings.scale}
+                    onChange={(e) => setSettings({ ...settings, scale: Number(e.target.value) })}
+                    className="w-full h-2 rounded-full appearance-none cursor-pointer slider"
+                  />
+                </div>
+                
+                {/* Rotation */}
+                <div className="mb-6">
+                  <label className="block text-sm font-medium text-gray-700 mb-3">
+                    Rotation ({settings.rotation}°)
+                  </label>
+                  <input
+                    type="range"
+                    min="0"
+                    max="360"
+                    value={settings.rotation}
+                    onChange={(e) => setSettings({ ...settings, rotation: Number(e.target.value) })}
+                    className="w-full h-2 rounded-full appearance-none cursor-pointer slider"
+                  />
+                </div>
               </div>
               
               {/* Colors - Neumorphic Color Picker */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+              <div className="export-section">
+                <label className="block text-sm font-medium text-gray-700 mb-3">
                   Colors
                 </label>
-                <div className="flex flex-wrap gap-2 mb-3">
+                <div className="flex flex-wrap gap-3 mb-4">
                   {settings.colors.map((color, index) => (
                     <motion.div
                       key={index}
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
-                      className="w-8 h-8 rounded-lg cursor-pointer shadow-neu-flat hover:shadow-neu-pressed transition-shadow duration-200 border-2 border-white"
+                      className="w-10 h-10 rounded-full cursor-pointer shadow-neu-flat-sm hover:shadow-neu-button transition-shadow duration-200 border-2 border-white"
                       style={{ backgroundColor: color }}
                       onClick={() => {
                         setSelectedColorIndex(index);
@@ -483,9 +492,9 @@ const PatternGenerator = () => {
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                     onClick={() => setShowColorPicker(true)}
-                    className="w-8 h-8 rounded-lg bg-neu-gradient shadow-neu-flat hover:shadow-neu-pressed transition-all duration-200 flex items-center justify-center"
+                    className="w-10 h-10 rounded-full bg-neu-gradient shadow-neu-flat-sm hover:shadow-neu-button transition-all duration-200 flex items-center justify-center"
                   >
-                    <SafeIcon icon={FiPalette} className="w-4 h-4 text-gray-600" />
+                    <SafeIcon icon={FiPalette} className="w-5 h-5 text-gray-600" />
                   </motion.button>
                 </div>
                 
@@ -495,32 +504,33 @@ const PatternGenerator = () => {
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -10 }}
-                      className="bg-neu-gradient rounded-lg p-4 shadow-neu-flat"
+                      className="bg-neu-gradient rounded-neu p-5 shadow-neu-flat"
                     >
-                      <h4 className="text-sm font-medium text-gray-700 mb-3">Choose Color</h4>
-                      <div className="grid grid-cols-6 gap-2 mb-3">
+                      <h4 className="text-sm font-medium text-gray-700 mb-4">Choose Color</h4>
+                      <div className="grid grid-cols-6 gap-3 mb-4">
                         {predefinedColors.map((color, index) => (
                           <motion.div
                             key={index}
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
-                            className="w-6 h-6 rounded cursor-pointer shadow-neu-flat-sm hover:shadow-neu-pressed-sm transition-shadow duration-200"
+                            className="w-8 h-8 rounded-full cursor-pointer shadow-neu-flat-sm hover:shadow-neu-button transition-shadow duration-200"
                             style={{ backgroundColor: color }}
                             onClick={() => handleColorChange(selectedColorIndex, color)}
                           />
                         ))}
                       </div>
-                      <div className="flex space-x-2">
+                      <div className="flex space-x-3">
                         <input
                           type="color"
-                          className="w-full h-8 rounded shadow-neu-pressed cursor-pointer"
+                          className="w-full h-10 rounded-neu-sm shadow-neu-pressed cursor-pointer"
                           onChange={(e) => handleColorChange(selectedColorIndex, e.target.value)}
+                          value={settings.colors[selectedColorIndex]}
                         />
                         <motion.button
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
                           onClick={() => setShowColorPicker(false)}
-                          className="px-3 py-1 text-sm bg-neu-gradient shadow-neu-flat hover:shadow-neu-pressed rounded transition-all duration-200"
+                          className="px-4 py-2 neu-button"
                         >
                           Done
                         </motion.button>
