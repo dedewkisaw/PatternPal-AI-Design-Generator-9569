@@ -7,6 +7,18 @@ export default {
   theme: {
     extend: {
       colors: {
+        neugray: {
+          50: '#f2f3f7',
+          100: '#e6e7eb',
+          200: '#d5d7db',
+          300: '#b4b6bc',
+          400: '#888a91',
+          500: '#6e7077',
+          600: '#5c5e64',
+          700: '#4a4c51',
+          800: '#3d3e42',
+          900: '#27282b',
+        },
         primary: {
           50: '#f0f9ff',
           100: '#e0f2fe',
@@ -18,52 +30,18 @@ export default {
           700: '#0369a1',
           800: '#075985',
           900: '#0c4a6e',
-        },
-        secondary: {
-          50: '#fdf4ff',
-          100: '#fae8ff',
-          200: '#f5d0fe',
-          300: '#f0abfc',
-          400: '#e879f9',
-          500: '#d946ef',
-          600: '#c026d3',
-          700: '#a21caf',
-          800: '#86198f',
-          900: '#701a75',
-        },
-        accent: {
-          50: '#fff7ed',
-          100: '#ffedd5',
-          200: '#fed7aa',
-          300: '#fdba74',
-          400: '#fb923c',
-          500: '#f97316',
-          600: '#ea580c',
-          700: '#c2410c',
-          800: '#9a3412',
-          900: '#7c2d12',
         }
       },
-      fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-        display: ['Inter', 'system-ui', 'sans-serif'],
+      boxShadow: {
+        'neu-flat': '-8px -8px 16px 0 rgba(255,255,255,0.6), 8px 8px 16px 0 rgba(0,0,0,0.1)',
+        'neu-pressed': 'inset -8px -8px 16px 0 rgba(255,255,255,0.6), inset 8px 8px 16px 0 rgba(0,0,0,0.1)',
+        'neu-flat-sm': '-4px -4px 8px 0 rgba(255,255,255,0.6), 4px 4px 8px 0 rgba(0,0,0,0.1)',
+        'neu-pressed-sm': 'inset -4px -4px 8px 0 rgba(255,255,255,0.6), inset 4px 4px 8px 0 rgba(0,0,0,0.1)',
       },
-      animation: {
-        'fade-in': 'fadeIn 0.5s ease-out',
-        'slide-up': 'slideUp 0.5s ease-out',
-        'pulse-slow': 'pulse 3s infinite',
-        'bounce-slow': 'bounce 2s infinite',
-      },
-      keyframes: {
-        fadeIn: {
-          '0%': { opacity: '0' },
-          '100%': { opacity: '1' },
-        },
-        slideUp: {
-          '0%': { transform: 'translateY(20px)', opacity: '0' },
-          '100%': { transform: 'translateY(0)', opacity: '1' },
-        },
-      },
+      backgroundImage: {
+        'neu-gradient': 'linear-gradient(145deg, #e6e7eb, #ffffff)',
+        'neu-gradient-pressed': 'linear-gradient(145deg, #d5d7db, #e6e7eb)',
+      }
     },
   },
   plugins: [],

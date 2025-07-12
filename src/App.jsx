@@ -40,11 +40,7 @@ function App() {
     <Router>
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
         <Navbar currentPage={currentPage} setCurrentPage={setCurrentPage} />
-        
-        <TutorialOverlay 
-          isFirstVisit={isFirstVisit} 
-          onComplete={() => setIsFirstVisit(false)} 
-        />
+        <TutorialOverlay isFirstVisit={isFirstVisit} onComplete={() => setIsFirstVisit(false)} />
         
         <AnimatePresence mode="wait">
           <Routes>
@@ -61,7 +57,6 @@ function App() {
                 <PatternGenerator />
               </motion.div>
             } />
-            
             <Route path="/gallery" element={
               <motion.div
                 key="gallery"
@@ -74,7 +69,6 @@ function App() {
                 <Gallery />
               </motion.div>
             } />
-            
             <Route path="/collaborate" element={
               <motion.div
                 key="collaborate"
@@ -87,7 +81,6 @@ function App() {
                 <Collaborate />
               </motion.div>
             } />
-
             <Route path="/profile" element={
               <motion.div
                 key="profile"
