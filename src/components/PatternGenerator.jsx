@@ -6,7 +6,8 @@ import * as FiIcons from 'react-icons/fi';
 const { 
   FiSliders, FiDownload, FiRefreshCcw, FiChevronDown, FiPalette, 
   FiMessageSquare, FiCpu, FiSend, FiLoader, FiZap, FiStar, 
-  FiTrendingUp, FiAperture, FiLayers, FiMagic, FiTarget
+  FiTrendingUp, FiAperture, FiLayers, FiMagic, FiTarget, 
+  FiSettings, FiFileText
 } = FiIcons;
 
 const PatternGenerator = () => {
@@ -18,6 +19,7 @@ const PatternGenerator = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedPrompts, setGeneratedPrompts] = useState([]);
   const [aiMode, setAiMode] = useState(false);
+  const [showExportModal, setShowExportModal] = useState(false);
   
   const [promptSuggestions, setPromptSuggestions] = useState([
     "Flowing organic waves in ocean blue and seafoam green",
@@ -231,6 +233,52 @@ const PatternGenerator = () => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    
+    setShowExportModal(false);
+  };
+
+  const handleExport = async (format, settings) => {
+    if (!canvasRef.current) return;
+    try {
+      // Get the canvas element
+      const canvas = canvasRef.current;
+      if (!canvas) {
+        console.error("Canvas not found");
+        return;
+      }
+      
+      if (format === 'png') {
+        // Export as PNG
+        const link = document.createElement('a');
+        link.download = `pattern-${Date.now()}.png`;
+        link.href = canvas.toDataURL('image/png');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } else if (format === 'svg') {
+        // Convert canvas to SVG (simplified approach)
+        const svgData = `
+          <svg xmlns="http://www.w3.org/2000/svg" width="${canvas.width}" height="${canvas.height}">
+            <image href="${canvas.toDataURL('image/png')}" width="${canvas.width}" height="${canvas.height}" />
+          </svg>
+        `;
+        const blob = new Blob([svgData], { type: 'image/svg+xml' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.download = `pattern-${Date.now()}.svg`;
+        link.href = url;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      }
+      
+      // Return true to indicate successful export
+      return true;
+    } catch (error) {
+      console.error("Error exporting pattern:", error);
+      return false;
+    }
   };
 
   const handleColorChange = (colorIndex, newColor) => {
@@ -890,26 +938,29 @@ const PatternGenerator = () => {
           
           {/* Main content container */}
           <div className="relative bg-white/95 backdrop-blur-sm rounded-2xl shadow-neu-card border border-white/70 overflow-hidden">
-            {/* Header with enhanced styling */}
-            <div className="bg-gradient-to-r from-gray-50/80 to-white/80 backdrop-blur-sm px-8 py-6 border-b border-gray-200/50">
+            {/* Enhanced Header */}
+            <div className="bg-gradient-to-r from-gray-50/80 via-white/90 to-gray-50/80 backdrop-blur-sm px-8 py-6 border-b border-gray-200/50">
               <div className="flex justify-between items-center">
-                <h2 className="text-3xl font-bold text-gray-900 flex items-center">
+                <div className="flex items-center">
                   <motion.div
-                    className="w-10 h-10 bg-gradient-to-br from-primary-500 to-purple-600 rounded-xl flex items-center justify-center mr-4 shadow-neu-flat-sm"
+                    className="w-12 h-12 bg-gradient-to-br from-primary-500 via-purple-500 to-pink-500 rounded-xl flex items-center justify-center mr-4 shadow-neu-button"
                     animate={isGenerating ? { rotate: 360 } : {}}
                     transition={{ duration: 2, repeat: isGenerating ? Infinity : 0, ease: "linear" }}
                   >
-                    <SafeIcon icon={FiLayers} className="w-5 h-5 text-white" />
+                    <SafeIcon icon={FiLayers} className="w-6 h-6 text-white" />
                   </motion.div>
-                  Pattern Studio
-                </h2>
+                  <div>
+                    <h2 className="text-3xl font-bold text-gray-900 mb-1">Pattern Studio</h2>
+                    <p className="text-gray-600 text-sm">Create and customize your pattern</p>
+                  </div>
+                </div>
                 
                 <div className="flex space-x-3">
                   <motion.button
                     whileHover={{ scale: 1.05, y: -2 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={generatePattern}
-                    className="flex items-center space-x-2 px-5 py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-xl shadow-neu-button hover:shadow-neu-flat transition-all duration-200"
+                    className="flex items-center space-x-2 px-5 py-3 bg-gradient-to-r from-primary-500 via-primary-600 to-purple-600 text-white rounded-xl shadow-neu-button hover:shadow-neu-flat transition-all duration-300"
                   >
                     <SafeIcon icon={FiRefreshCcw} className="w-4 h-4" />
                     <span>Generate</span>
@@ -918,55 +969,63 @@ const PatternGenerator = () => {
                   <motion.button
                     whileHover={{ scale: 1.05, y: -2 }}
                     whileTap={{ scale: 0.95 }}
-                    onClick={handleDownload}
-                    className="flex items-center space-x-2 px-5 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl shadow-neu-button hover:shadow-neu-flat transition-all duration-200"
+                    onClick={() => setShowExportModal(true)}
+                    className="flex items-center space-x-2 px-5 py-3 bg-gradient-to-r from-green-500 via-green-600 to-teal-600 text-white rounded-xl shadow-neu-button hover:shadow-neu-flat transition-all duration-300"
                   >
                     <SafeIcon icon={FiDownload} className="w-4 h-4" />
-                    <span>Download</span>
+                    <span>Export</span>
                   </motion.button>
                 </div>
               </div>
             </div>
             
-            {/* Main content area */}
-            <div className="p-8">
+            {/* Enhanced Canvas Area */}
+            <div className="p-8 bg-gradient-to-br from-gray-50/50 via-white/30 to-gray-50/50">
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Canvas area with enhanced styling */}
                 <div className="lg:col-span-2">
                   <motion.div
-                    className="relative"
+                    className="relative group"
                     whileHover={{ scale: 1.01 }}
                     transition={{ duration: 0.3 }}
                   >
-                    {/* Canvas background layers */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-neu-pressed transform rotate-1" />
-                    <div className="absolute inset-0 bg-white rounded-2xl shadow-neu-flat-sm" />
+                    {/* Enhanced Canvas Background Layers */}
+                    <div className="absolute -inset-2 bg-gradient-to-br from-primary-500/5 via-purple-500/5 to-pink-500/5 rounded-3xl transform rotate-1 group-hover:rotate-2 transition-transform duration-300" />
+                    <div className="absolute -inset-1 bg-white rounded-2xl shadow-neu-pressed transform -rotate-1 group-hover:rotate-0 transition-transform duration-300" />
                     
                     <canvas 
                       ref={canvasRef} 
-                      className="relative w-full h-[500px] rounded-2xl shadow-neu-flat bg-white border-4 border-white/80" 
-                      style={{ background: 'linear-gradient(135deg, #fafafa 0%, #ffffff 100%)' }}
+                      className="relative w-full h-[500px] rounded-2xl shadow-neu-flat bg-white border-4 border-white/90 transition-all duration-300 group-hover:shadow-neu-card" 
+                      style={{ 
+                        background: 'linear-gradient(135deg, #fafafa 0%, #ffffff 100%)',
+                        boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.05)'
+                      }}
                     />
                     
-                    {/* Generation overlay */}
+                    {/* Enhanced Generation Overlay */}
                     <AnimatePresence>
                       {isGenerating && (
                         <motion.div
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
                           exit={{ opacity: 0 }}
-                          className="absolute inset-0 bg-white/80 backdrop-blur-sm rounded-2xl flex items-center justify-center"
+                          className="absolute inset-0 bg-white/90 backdrop-blur-md rounded-2xl flex items-center justify-center"
                         >
                           <div className="text-center">
                             <motion.div
-                              animate={{ rotate: 360 }}
-                              transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                              className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-neu-button"
+                              animate={{ 
+                                rotate: 360,
+                                scale: [1, 1.1, 1]
+                              }}
+                              transition={{ 
+                                rotate: { duration: 2, repeat: Infinity, ease: "linear" },
+                                scale: { duration: 1, repeat: Infinity, ease: "easeInOut" }
+                              }}
+                              className="w-20 h-20 bg-gradient-to-r from-primary-500 via-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg"
                             >
-                              <SafeIcon icon={FiCpu} className="w-8 h-8 text-white" />
+                              <SafeIcon icon={FiCpu} className="w-10 h-10 text-white" />
                             </motion.div>
-                            <h3 className="text-xl font-semibold text-gray-900 mb-2">AI Creating Your Pattern</h3>
-                            <p className="text-gray-600">This may take a moment...</p>
+                            <h3 className="text-2xl font-bold text-gray-900 mb-2">Creating Your Pattern</h3>
+                            <p className="text-gray-600">Generating something beautiful...</p>
                           </div>
                         </motion.div>
                       )}
@@ -1167,6 +1226,136 @@ const PatternGenerator = () => {
             </div>
           </div>
         </motion.div>
+        
+        {/* Export Modal */}
+        <AnimatePresence>
+          {showExportModal && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30 backdrop-blur-md"
+              onClick={() => setShowExportModal(false)}
+            >
+              <motion.div
+                initial={{ scale: 0.95, opacity: 0, y: 20 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.95, opacity: 0, y: 20 }}
+                className="relative max-w-lg w-full bg-white/90 backdrop-blur-sm rounded-2xl overflow-hidden shadow-neu-card border border-white/50"
+                onClick={e => e.stopPropagation()}
+              >
+                {/* Modal Header */}
+                <div className="bg-gradient-to-r from-primary-500/10 to-purple-500/10 p-6 border-b border-gray-200/50">
+                  <div className="flex items-center">
+                    <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-purple-600 rounded-xl flex items-center justify-center shadow-neu-button mr-4">
+                      <SafeIcon icon={FiDownload} className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-2xl font-bold text-gray-900">Export Pattern</h3>
+                      <p className="text-gray-600">Choose your preferred export format</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Modal Content */}
+                <div className="p-6 space-y-6">
+                  {/* Format Selection */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <motion.button
+                      whileHover={{ scale: 1.02, y: -2 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => handleExport('png')}
+                      className="p-4 bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-neu-flat hover:shadow-neu-button border border-gray-200/50 transition-all duration-200"
+                    >
+                      <div className="flex items-center justify-center mb-3">
+                        <div className="w-10 h-10 bg-blue-500/10 rounded-lg flex items-center justify-center">
+                          <SafeIcon icon={FiFileText} className="w-5 h-5 text-blue-500" />
+                        </div>
+                      </div>
+                      <div className="text-center">
+                        <h4 className="font-semibold text-gray-900">PNG Format</h4>
+                        <p className="text-sm text-gray-600">High-quality image</p>
+                      </div>
+                    </motion.button>
+
+                    <motion.button
+                      whileHover={{ scale: 1.02, y: -2 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => handleExport('svg')}
+                      className="p-4 bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-neu-flat hover:shadow-neu-button border border-gray-200/50 transition-all duration-200"
+                    >
+                      <div className="flex items-center justify-center mb-3">
+                        <div className="w-10 h-10 bg-purple-500/10 rounded-lg flex items-center justify-center">
+                          <SafeIcon icon={FiFileText} className="w-5 h-5 text-purple-500" />
+                        </div>
+                      </div>
+                      <div className="text-center">
+                        <h4 className="font-semibold text-gray-900">SVG Format</h4>
+                        <p className="text-sm text-gray-600">Scalable vector</p>
+                      </div>
+                    </motion.button>
+                  </div>
+
+                  {/* Resolution Settings */}
+                  <div className="bg-gray-50/50 rounded-xl p-4 border border-gray-200/50">
+                    <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center">
+                      <SafeIcon icon={FiSettings} className="w-4 h-4 mr-2" />
+                      Export Settings
+                    </h4>
+                    <div className="space-y-3">
+                      <div>
+                        <label className="text-sm text-gray-600">Resolution</label>
+                        <select className="w-full mt-1 px-3 py-2 bg-white rounded-lg shadow-neu-pressed-sm border border-gray-200/50 outline-none">
+                          <option>1024 x 1024 px</option>
+                          <option>2048 x 2048 px</option>
+                          <option>4096 x 4096 px</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="text-sm text-gray-600">Quality</label>
+                        <div className="relative mt-1">
+                          <input
+                            type="range"
+                            min="1"
+                            max="100"
+                            value="100"
+                            className="w-full h-2 bg-gradient-to-r from-gray-200 to-gray-300 rounded-full appearance-none cursor-pointer"
+                          />
+                          <div className="flex justify-between text-xs text-gray-500 mt-1">
+                            <span>Standard</span>
+                            <span>High</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Modal Footer */}
+                <div className="bg-gray-50/50 p-6 border-t border-gray-200/50">
+                  <div className="flex justify-end space-x-3">
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => setShowExportModal(false)}
+                      className="px-4 py-2 text-gray-700 bg-white rounded-lg shadow-neu-flat hover:shadow-neu-button transition-all duration-200"
+                    >
+                      Cancel
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={handleDownload}
+                      className="px-4 py-2 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-lg shadow-neu-button hover:shadow-neu-flat transition-all duration-200"
+                    >
+                      Export Pattern
+                    </motion.button>
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );
