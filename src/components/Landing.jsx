@@ -4,88 +4,213 @@ import { Link } from 'react-router-dom';
 import SafeIcon from '../common/SafeIcon';
 import * as FiIcons from 'react-icons/fi';
 
-const { FiEdit2, FiDownload, FiShare2, FiZap, FiLayers, FiPalette } = FiIcons;
+const { FiEdit2, FiDownload, FiShare2, FiZap, FiLayers, FiPalette, FiStar, FiHeart, FiCpu, FiAperture, FiTarget, FiTrendingUp } = FiIcons;
 
 const Landing = () => {
-  // Create floating pattern elements
+  // Create new dynamic floating elements with more variety
   const createFloatingElements = () => {
-    const elements = [];
-    const icons = [FiEdit2, FiLayers, FiPalette, FiShare2, FiDownload, FiZap];
-    
-    for (let i = 0; i < 8; i++) {
-      const icon = icons[i % icons.length];
-      elements.push({
+    const iconSets = [
+      { icon: FiStar, color: '#FFD700', glow: '#FFE55C' },
+      { icon: FiHeart, color: '#FF6B9D', glow: '#FFB3D1' },
+      { icon: FiCpu, color: '#00D4FF', glow: '#66E0FF' },
+      { icon: FiAperture, color: '#7C3AED', glow: '#A855F7' },
+      { icon: FiTarget, color: '#10B981', glow: '#34D399' },
+      { icon: FiTrendingUp, color: '#F59E0B', glow: '#FBBF24' },
+      { icon: FiZap, color: '#EF4444', glow: '#F87171' },
+      { icon: FiLayers, color: '#8B5CF6', glow: '#A78BFA' }
+    ];
+
+    return Array.from({ length: 15 }, (_, i) => {
+      const iconSet = iconSets[i % iconSets.length];
+      return {
         id: i,
-        icon,
+        icon: iconSet.icon,
+        color: iconSet.color,
+        glow: iconSet.glow,
         x: Math.random() * 100,
         y: Math.random() * 100,
-        size: 60 + Math.random() * 40,
-        rotation: Math.random() * 360,
-        duration: 15 + Math.random() * 10,
+        size: 30 + Math.random() * 40,
+        initialRotation: Math.random() * 360,
+        floatDuration: 8 + Math.random() * 12,
+        pulseDuration: 2 + Math.random() * 3,
         delay: Math.random() * 5,
-        gradient: [
-          `hsl(${Math.random() * 360}, 70%, 50%)`,
-          `hsl(${Math.random() * 360}, 70%, 60%)`
-        ],
-      });
-    }
-    return elements;
+        amplitude: 30 + Math.random() * 50
+      };
+    });
   };
 
   const floatingElements = createFloatingElements();
 
-  const PatternIcon = ({ element }) => {
-    const { icon, size, x, y, rotation, duration, delay, gradient } = element;
-    
+  const FloatingIcon = ({ element }) => {
+    const {
+      icon,
+      color,
+      glow,
+      x,
+      y,
+      size,
+      initialRotation,
+      floatDuration,
+      pulseDuration,
+      delay,
+      amplitude
+    } = element;
+
+    // Floating animation - figure-8 pattern
+    const floatingVariants = {
+      animate: {
+        x: [0, amplitude, 0, -amplitude, 0],
+        y: [0, -amplitude/2, -amplitude, -amplitude/2, 0],
+        rotate: [initialRotation, initialRotation + 360, initialRotation + 720],
+        transition: {
+          duration: floatDuration,
+          repeat: Infinity,
+          ease: "easeInOut",
+          delay: delay
+        }
+      }
+    };
+
+    // Pulsing glow effect
+    const pulseVariants = {
+      animate: {
+        scale: [1, 1.3, 1],
+        opacity: [0.3, 0.7, 0.3],
+        transition: {
+          duration: pulseDuration,
+          repeat: Infinity,
+          ease: "easeInOut",
+          delay: delay * 0.5
+        }
+      }
+    };
+
+    // Icon scale animation
+    const iconVariants = {
+      animate: {
+        scale: [1, 1.1, 1],
+        transition: {
+          duration: pulseDuration * 1.5,
+          repeat: Infinity,
+          ease: "easeInOut",
+          delay: delay * 0.3
+        }
+      }
+    };
+
     return (
       <motion.div
         className="absolute pointer-events-none"
         style={{
           left: `${x}%`,
           top: `${y}%`,
+          width: size,
+          height: size
         }}
-        initial={{
-          rotate: rotation,
-          scale: 0,
+        variants={floatingVariants}
+        animate="animate"
+      >
+        {/* Outer glow */}
+        <motion.div
+          className="absolute inset-0 rounded-full"
+          style={{
+            background: `radial-gradient(circle, ${glow}40 0%, ${glow}20 50%, transparent 70%)`,
+            filter: 'blur(15px)'
+          }}
+          variants={pulseVariants}
+          animate="animate"
+        />
+        
+        {/* Main container */}
+        <motion.div
+          className="relative w-full h-full rounded-2xl backdrop-blur-sm flex items-center justify-center"
+          style={{
+            background: `linear-gradient(135deg, ${color}15, ${color}30)`,
+            border: `1px solid ${color}50`,
+            boxShadow: `0 8px 32px ${color}25, inset 0 1px 0 ${color}40`
+          }}
+          variants={iconVariants}
+          animate="animate"
+        >
+          {/* Inner glow */}
+          <div
+            className="absolute inset-1 rounded-xl"
+            style={{
+              background: `radial-gradient(circle at 30% 30%, ${glow}30, transparent 70%)`
+            }}
+          />
+          
+          {/* Icon */}
+          <SafeIcon
+            icon={icon}
+            className="relative z-10"
+            style={{ 
+              color: color,
+              fontSize: size * 0.4,
+              filter: `drop-shadow(0 2px 4px ${color}40)`
+            }}
+          />
+        </motion.div>
+      </motion.div>
+    );
+  };
+
+  // Particle system for additional ambience
+  const createParticles = () => {
+    return Array.from({ length: 20 }, (_, i) => ({
+      id: i,
+      x: Math.random() * 100,
+      y: Math.random() * 100,
+      size: 2 + Math.random() * 4,
+      duration: 10 + Math.random() * 20,
+      delay: Math.random() * 10
+    }));
+  };
+
+  const particles = createParticles();
+
+  const Particle = ({ particle }) => {
+    const { x, y, size, duration, delay } = particle;
+
+    return (
+      <motion.div
+        className="absolute rounded-full bg-gradient-to-r from-blue-400 to-purple-400 opacity-30"
+        style={{
+          left: `${x}%`,
+          top: `${y}%`,
+          width: size,
+          height: size
         }}
         animate={{
-          rotate: [rotation, rotation + 360],
-          scale: [0, 1, 1, 0],
-          x: [0, Math.sin(y) * 50, 0],
-          y: [0, Math.cos(x) * 30, 0],
+          y: [-20, 20, -20],
+          opacity: [0.1, 0.5, 0.1],
+          scale: [0.5, 1, 0.5]
         }}
         transition={{
           duration: duration,
           repeat: Infinity,
           ease: "easeInOut",
-          delay: delay,
+          delay: delay
         }}
-      >
-        <div
-          className="rounded-xl flex items-center justify-center"
-          style={{
-            width: size,
-            height: size,
-            background: `linear-gradient(145deg, ${gradient[0]}, ${gradient[1]})`,
-            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-          }}
-        >
-          <SafeIcon
-            icon={icon}
-            className="w-1/2 h-1/2 text-white"
-          />
-        </div>
-      </motion.div>
+      />
     );
   };
 
   return (
     <div className="relative min-h-screen overflow-hidden">
-      {/* Floating Pattern Icons */}
+      {/* Dynamic Floating Icons Background */}
       <div className="absolute inset-0 overflow-hidden">
         {floatingElements.map((element) => (
-          <PatternIcon key={element.id} element={element} />
+          <FloatingIcon key={element.id} element={element} />
         ))}
+        
+        {/* Ambient particles */}
+        {particles.map((particle) => (
+          <Particle key={particle.id} particle={particle} />
+        ))}
+        
+        {/* Gradient overlay for depth */}
+        <div className="absolute inset-0 bg-gradient-to-br from-transparent via-blue-50/30 to-purple-50/30 pointer-events-none" />
       </div>
 
       {/* Hero Section */}
