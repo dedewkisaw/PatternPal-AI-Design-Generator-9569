@@ -4,13 +4,13 @@ import { motion } from 'framer-motion';
 import SafeIcon from '../common/SafeIcon';
 import * as FiIcons from 'react-icons/fi';
 
-const { FiHome, FiGrid, FiUsers, FiUser } = FiIcons;
+const { FiHome, FiGrid, FiEdit2, FiUser } = FiIcons;
 
 const Navbar = ({ currentPage, setCurrentPage }) => {
   const navItems = [
     { path: '/', name: 'Home', icon: FiHome },
+    { path: '/editor', name: 'Editor', icon: FiEdit2 },
     { path: '/gallery', name: 'Gallery', icon: FiGrid },
-    { path: '/collaborate', name: 'Collaborate', icon: FiUsers },
     { path: '/profile', name: 'Profile', icon: FiUser }
   ];
 

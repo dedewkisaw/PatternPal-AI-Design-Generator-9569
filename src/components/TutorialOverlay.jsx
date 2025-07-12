@@ -3,10 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import SafeIcon from '../common/SafeIcon';
 import * as FiIcons from 'react-icons/fi';
 
-const { 
-  FiX, FiArrowRight, FiCheck, FiDownload, FiLayers, 
-  FiSliders, FiZap, FiSave, FiFileText 
-} = FiIcons;
+const { FiX, FiArrowRight, FiCheck, FiDownload, FiLayers, FiSliders, FiZap, FiSave, FiFileText } = FiIcons;
 
 const TutorialOverlay = ({ isFirstVisit, onComplete }) => {
   const [currentStep, setCurrentStep] = useState(0);
@@ -20,20 +17,20 @@ const TutorialOverlay = ({ isFirstVisit, onComplete }) => {
       position: "center",
     },
     {
-      title: "Choose Your Template",
-      description: "Start by selecting a template style that matches your vision.",
+      title: "Choose Your Style",
+      description: "Start by selecting a pattern style - geometric, organic, or abstract.",
       icon: FiLayers,
-      target: ".template-section",
+      target: ".style-section",
     },
     {
       title: "Customize Your Pattern",
-      description: "Adjust colors, complexity, and other settings to make it unique.",
+      description: "Adjust complexity, scale, rotation and colors to make it unique.",
       icon: FiSliders,
       target: ".settings-section",
     },
     {
       title: "Export Options",
-      description: "Export your pattern in various formats including SVG, PNG, and PDF.",
+      description: "Export your pattern in various formats including PNG and SVG.",
       icon: FiDownload,
       target: ".export-section",
     },
@@ -86,9 +83,9 @@ const TutorialOverlay = ({ isFirstVisit, onComplete }) => {
             <div className="flex justify-between items-center mb-6">
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center">
-                  <SafeIcon 
-                    icon={tutorials[currentStep].icon} 
-                    className="w-5 h-5 text-primary-600" 
+                  <SafeIcon
+                    icon={tutorials[currentStep].icon}
+                    className="w-5 h-5 text-primary-600"
                   />
                 </div>
                 <span className="text-sm text-gray-500">
@@ -121,10 +118,12 @@ const TutorialOverlay = ({ isFirstVisit, onComplete }) => {
                 onClick={handleNext}
                 className="flex items-center space-x-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
               >
-                <span>{currentStep === tutorials.length - 1 ? 'Get Started' : 'Next'}</span>
-                <SafeIcon 
-                  icon={currentStep === tutorials.length - 1 ? FiCheck : FiArrowRight} 
-                  className="w-4 h-4" 
+                <span>
+                  {currentStep === tutorials.length - 1 ? 'Get Started' : 'Next'}
+                </span>
+                <SafeIcon
+                  icon={currentStep === tutorials.length - 1 ? FiCheck : FiArrowRight}
+                  className="w-4 h-4"
                 />
               </button>
             </div>
