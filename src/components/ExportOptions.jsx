@@ -71,10 +71,7 @@ const ExportOptions = ({ pattern, onExport, onClose }) => {
                 : 'bg-neu-gradient shadow-neu-flat-sm hover:shadow-neu-button'
             }`}
           >
-            <SafeIcon 
-              icon={format.icon} 
-              className="w-5 h-5 mx-auto mb-2 text-current" 
-            />
+            <SafeIcon icon={format.icon} className="w-5 h-5 mx-auto mb-2 text-current" />
             <span className="text-sm font-medium">
               {format.name}
             </span>

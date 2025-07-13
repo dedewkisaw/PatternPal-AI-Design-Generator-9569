@@ -8,6 +8,7 @@ import Gallery from './components/Gallery';
 import UserProfile from './components/UserProfile';
 import TutorialOverlay from './components/TutorialOverlay';
 import Footer from './components/Footer';
+import Collaborate from './components/Collaborate';
 
 // Wrapper component to handle tutorial display logic
 const AppContent = () => {
@@ -22,6 +23,7 @@ const AppContent = () => {
     else if (path === '/editor') setCurrentPage('editor');
     else if (path === '/gallery') setCurrentPage('gallery');
     else if (path === '/profile') setCurrentPage('profile');
+    else if (path === '/collaborate') setCurrentPage('collaborate');
 
     // Check if we should show tutorial (only when directly navigating to editor)
     if (path === '/editor') {
@@ -60,12 +62,12 @@ const AppContent = () => {
       <AnimatePresence mode="wait">
         <Routes>
           <Route path="/" element={
-            <motion.div
-              key="home"
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              variants={pageVariants}
+            <motion.div 
+              key="home" 
+              initial="initial" 
+              animate="animate" 
+              exit="exit" 
+              variants={pageVariants} 
               transition={pageTransition}
             >
               <Landing />
@@ -73,12 +75,12 @@ const AppContent = () => {
           } />
           
           <Route path="/editor" element={
-            <motion.div
-              key="editor"
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              variants={pageVariants}
+            <motion.div 
+              key="editor" 
+              initial="initial" 
+              animate="animate" 
+              exit="exit" 
+              variants={pageVariants} 
               transition={pageTransition}
             >
               <Editor />
@@ -86,12 +88,12 @@ const AppContent = () => {
           } />
           
           <Route path="/gallery" element={
-            <motion.div
-              key="gallery"
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              variants={pageVariants}
+            <motion.div 
+              key="gallery" 
+              initial="initial" 
+              animate="animate" 
+              exit="exit" 
+              variants={pageVariants} 
               transition={pageTransition}
             >
               <Gallery />
@@ -99,15 +101,28 @@ const AppContent = () => {
           } />
           
           <Route path="/profile" element={
-            <motion.div
-              key="profile"
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              variants={pageVariants}
+            <motion.div 
+              key="profile" 
+              initial="initial" 
+              animate="animate" 
+              exit="exit" 
+              variants={pageVariants} 
               transition={pageTransition}
             >
               <UserProfile />
+            </motion.div>
+          } />
+          
+          <Route path="/collaborate" element={
+            <motion.div 
+              key="collaborate" 
+              initial="initial" 
+              animate="animate" 
+              exit="exit" 
+              variants={pageVariants} 
+              transition={pageTransition}
+            >
+              <Collaborate />
             </motion.div>
           } />
         </Routes>

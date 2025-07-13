@@ -6,7 +6,10 @@ import SafeIcon from '../common/SafeIcon';
 import html2canvas from 'html2canvas';
 import * as FiIcons from 'react-icons/fi';
 
-const { FiSave, FiShare2, FiDownload, FiCheck, FiEdit, FiImage, FiTag, FiTrash2, FiX } = FiIcons;
+const { 
+  FiSave, FiShare2, FiDownload, FiCheck, FiEdit, 
+  FiImage, FiTag, FiTrash2, FiX
+} = FiIcons;
 
 const Editor = () => {
   const [showExportModal, setShowExportModal] = useState(false);
@@ -35,9 +38,9 @@ const Editor = () => {
         console.error("Error loading saved patterns:", error);
       }
     };
-    
+
     loadSavedPatterns();
-    
+
     // Check if we're editing a pattern
     const editingId = localStorage.getItem('editingPatternId');
     if (editingId) {
@@ -50,6 +53,7 @@ const Editor = () => {
           tags: patternToEdit.tags || []
         });
       }
+      
       // Clear the editing ID to prevent issues on refresh
       localStorage.removeItem('editingPatternId');
     }
@@ -57,7 +61,7 @@ const Editor = () => {
 
   const handleExport = async (format, settings) => {
     if (!patternRef.current) return;
-    
+
     try {
       // Get the canvas element from the PatternGenerator
       const canvas = patternRef.current.querySelector('canvas');
@@ -81,7 +85,6 @@ const Editor = () => {
             <image href="${canvas.toDataURL('image/png')}" width="${canvas.width}" height="${canvas.height}" />
           </svg>
         `;
-        
         const blob = new Blob([svgData], { type: 'image/svg+xml' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
@@ -103,11 +106,11 @@ const Editor = () => {
 
   const handleSavePattern = () => {
     if (!patternRef.current) return;
-    
+
     try {
       const canvas = patternRef.current.querySelector('canvas');
       if (!canvas) return;
-      
+
       const newPattern = {
         id: editingPattern ? editingPattern.id : Date.now(),
         name: patternData.name || `Pattern ${savedPatterns.length + 1}`,
@@ -118,9 +121,8 @@ const Editor = () => {
         likes: editingPattern ? editingPattern.likes || 0 : 0,
         downloads: editingPattern ? editingPattern.downloads || 0 : 0
       };
-      
+
       let updatedPatterns;
-      
       if (editingPattern) {
         // Update existing pattern
         updatedPatterns = savedPatterns.map(pattern => 
@@ -134,15 +136,11 @@ const Editor = () => {
       // Save to local storage and state
       setSavedPatterns(updatedPatterns);
       localStorage.setItem('savedPatterns', JSON.stringify(updatedPatterns));
-      
+
       // Reset form data
-      setPatternData({
-        name: '',
-        description: '',
-        tags: []
-      });
+      setPatternData({ name: '', description: '', tags: [] });
       setEditingPattern(null);
-      
+
       // Show success indicator and close modal
       setIsSaved(true);
       setShowSaveModal(false);
@@ -161,14 +159,12 @@ const Editor = () => {
 
   const handleAddTag = () => {
     if (!tagInput.trim()) return;
-    
     if (!patternData.tags.includes(tagInput.trim())) {
-      setPatternData({ 
-        ...patternData, 
+      setPatternData({
+        ...patternData,
         tags: [...patternData.tags, tagInput.trim()]
       });
     }
-    
     setTagInput('');
   };
 
@@ -235,12 +231,12 @@ const Editor = () => {
             </motion.button>
           </div>
         </motion.div>
-        
+
         {/* Pattern Generator */}
         <div className="neu-card" ref={patternRef}>
           <PatternGenerator />
         </div>
-        
+
         {/* Export Modal */}
         <AnimatePresence>
           {showExportModal && (
@@ -270,7 +266,7 @@ const Editor = () => {
                   </motion.button>
                 </div>
                 
-                <ExportOptions
+                <ExportOptions 
                   onExport={handleExport}
                   onClose={() => setShowExportModal(false)}
                 />
@@ -278,7 +274,7 @@ const Editor = () => {
             </motion.div>
           )}
         </AnimatePresence>
-        
+
         {/* Save Modal */}
         <AnimatePresence>
           {showSaveModal && (
@@ -326,7 +322,7 @@ const Editor = () => {
                       className="w-full px-4 py-3 neu-input"
                       placeholder="e.g. Geometric Waves"
                       value={patternData.name}
-                      onChange={(e) => setPatternData({...patternData, name: e.target.value})}
+                      onChange={(e) => setPatternData({ ...patternData, name: e.target.value })}
                     />
                   </div>
                   
@@ -340,7 +336,7 @@ const Editor = () => {
                       placeholder="Describe your pattern..."
                       rows="3"
                       value={patternData.description}
-                      onChange={(e) => setPatternData({...patternData, description: e.target.value})}
+                      onChange={(e) => setPatternData({ ...patternData, description: e.target.value })}
                     ></textarea>
                   </div>
                   

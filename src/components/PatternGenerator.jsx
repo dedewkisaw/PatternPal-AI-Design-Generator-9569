@@ -3,11 +3,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import SafeIcon from '../common/SafeIcon';
 import * as FiIcons from 'react-icons/fi';
 
-const { 
-  FiSliders, FiDownload, FiRefreshCcw, FiChevronDown, FiPalette, 
-  FiMessageSquare, FiCpu, FiSend, FiLoader, FiZap, FiStar, 
-  FiTrendingUp, FiAperture, FiLayers, FiMagic, FiTarget, 
-  FiSettings, FiFileText
+const {
+  FiSliders, FiDownload, FiRefreshCcw, FiChevronDown, FiPalette,
+  FiMessageSquare, FiCpu, FiSend, FiLoader, FiZap, FiStar,
+  FiTrendingUp, FiAperture, FiLayers, FiMagic, FiTarget,
+  FiSettings, FiFileText, FiInfo, FiX, FiCamera, FiCoffee
 } = FiIcons;
 
 const PatternGenerator = () => {
@@ -20,16 +20,16 @@ const PatternGenerator = () => {
   const [generatedPrompts, setGeneratedPrompts] = useState([]);
   const [aiMode, setAiMode] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
-  
+  const [showHelpModal, setShowHelpModal] = useState(false);
   const [promptSuggestions, setPromptSuggestions] = useState([
-    "Flowing organic waves in ocean blue and seafoam green",
-    "Geometric crystal formations with purple and gold gradients", 
-    "Abstract neural network pattern in electric blue",
-    "Mandala-inspired geometric design with warm sunset colors",
-    "Minimalist grid pattern with subtle grayscale tones",
-    "Tropical leaf pattern with vibrant jungle greens",
-    "Art deco geometric pattern with black and gold",
-    "Watercolor-style abstract blooms in pastel colors"
+    "Flowing ocean waves with teapots floating",
+    "Geometric teapot pattern with gold accents",
+    "Coffee cups and teapots in pastel colors",
+    "Vintage teapot collection in blue and white",
+    "Abstract teapot silhouettes on dark background",
+    "Tea party pattern with teapots and flowers",
+    "Modern minimalist teapot line art",
+    "Teapot and cup seamless pattern"
   ]);
 
   const [settings, setSettings] = useState({
@@ -38,9 +38,58 @@ const PatternGenerator = () => {
     rotation: 45,
     noise: 0.2,
     colors: ['#3B82F6', '#8B5CF6', '#F59E0B', '#EC4899'],
-    style: 'geometric'
+    style: 'geometric',
+    showObjects: true,
+    objectType: 'teapot' // Default object type
   });
 
+  // Predefined object types for pattern generation
+  const objectTypes = [
+    {
+      value: 'teapot',
+      label: 'Teapot',
+      paths: [
+        "M15,10 C15,6 20,5 20,10 L20,13 C20,15 18,16 15,16 L10,16 C7,16 5,15 5,13 L5,10 C5,5 10,6 10,10 L15,10 Z M8,16 L8,18 L17,18 L17,16 M10,5 L15,5 C16,5 17,6 17,7 L17,8 L8,8 L8,7 C8,6 9,5 10,5 Z M12,2 L12,5 M9,8 L9,10 M16,8 L16,10"
+      ]
+    },
+    {
+      value: 'coffee',
+      label: 'Coffee Cup',
+      paths: [
+        "M5,5 L5,15 C5,18 8,20 12,20 C16,20 19,18 19,15 L19,5 L5,5 Z M19,8 C21,8 21,5 21,5 L3,5 C3,5 3,8 5,8 M12,2 L12,5 M8,2 L16,2"
+      ]
+    },
+    {
+      value: 'leaf',
+      label: 'Leaf',
+      paths: [
+        "M12,2 C8,2 3,10 3,16 C3,20 6,22 12,22 C18,22 21,20 21,16 C21,10 16,2 12,2 Z M12,2 C12,8 12,18 12,22 M7,8 C10,12 14,12 17,8 M7,13 C10,17 14,17 17,13"
+      ]
+    },
+    {
+      value: 'star',
+      label: 'Star',
+      paths: [
+        "M12,2 L15,9 L22,9 L16,14 L18,21 L12,17 L6,21 L8,14 L2,9 L9,9 Z"
+      ]
+    },
+    {
+      value: 'heart',
+      label: 'Heart',
+      paths: [
+        "M12,21 C12,21 20,15 20,8 C20,5 18,3 15,3 C13,3 12,4 12,4 C12,4 11,3 9,3 C6,3 4,5 4,8 C4,15 12,21 12,21 Z"
+      ]
+    },
+    {
+      value: 'flower',
+      label: 'Flower',
+      paths: [
+        "M12,12 m-8,0 a8,8 0 1,0 16,0 a8,8 0 1,0 -16,0 Z M12,4 C14,6 16,4 12,12 M12,4 C10,6 8,4 12,12 M12,20 C14,18 16,20 12,12 M12,20 C10,18 8,20 12,12 M4,12 C6,14 4,16 12,12 M4,12 C6,10 4,8 12,12 M20,12 C18,14 20,16 12,12 M20,12 C18,10 20,8 12,12"
+      ]
+    }
+  ];
+
+  // Define pattern style functions
   const patternStyles = {
     geometric: drawGeometricPattern,
     organic: drawOrganicPattern,
@@ -54,32 +103,80 @@ const PatternGenerator = () => {
   ];
 
   const predefinedColors = [
-    '#3B82F6', '#8B5CF6', '#F59E0B', '#EC4899', 
-    '#10B981', '#EF4444', '#6366F1', '#F97316', 
-    '#84CC16', '#06B6D4', '#8B5A2B', '#DC2626', 
-    '#7C3AED', '#059669', '#B91C1C', '#7C2D12', 
+    '#3B82F6', '#8B5CF6', '#F59E0B', '#EC4899',
+    '#10B981', '#EF4444', '#6366F1', '#F97316',
+    '#84CC16', '#06B6D4', '#8B5A2B', '#DC2626',
+    '#7C3AED', '#059669', '#B91C1C', '#7C2D12',
     '#1E40AF', '#BE185D', '#0F766E', '#7C2D12',
     '#581C87', '#92400E', '#1E3A8A', '#991B1B'
   ];
 
+  // Initialize canvas and generate pattern on component mount and settings change
   useEffect(() => {
     generatePattern();
   }, [settings]);
 
+  // Helper function to draw SVG path on canvas
+  const drawSVGPath = (ctx, pathData, x, y, scale = 1, rotation = 0, color = '#000000') => {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(rotation * Math.PI / 180);
+    ctx.scale(scale, scale);
+    
+    const path = new Path2D(pathData);
+    ctx.fillStyle = color + '80'; // Semi-transparent
+    ctx.fill(path);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 0.5;
+    ctx.stroke(path);
+    
+    ctx.restore();
+  };
+
+  // Find object type based on prompt
+  const findObjectTypeFromPrompt = (promptText) => {
+    const lowercasePrompt = promptText.toLowerCase();
+    
+    // Check for object types mentioned in the prompt
+    if (lowercasePrompt.includes('teapot') || lowercasePrompt.includes('tea pot') || 
+        lowercasePrompt.includes('kettle') || lowercasePrompt.includes('brew')) {
+      return 'teapot';
+    } else if (lowercasePrompt.includes('coffee') || lowercasePrompt.includes('cup') || 
+               lowercasePrompt.includes('mug') || lowercasePrompt.includes('cafe')) {
+      return 'coffee';
+    } else if (lowercasePrompt.includes('leaf') || lowercasePrompt.includes('leaves') || 
+               lowercasePrompt.includes('plant') || lowercasePrompt.includes('nature')) {
+      return 'leaf';
+    } else if (lowercasePrompt.includes('star') || lowercasePrompt.includes('sparkle') || 
+               lowercasePrompt.includes('night') || lowercasePrompt.includes('sky')) {
+      return 'star';
+    } else if (lowercasePrompt.includes('heart') || lowercasePrompt.includes('love') || 
+               lowercasePrompt.includes('valentine') || lowercasePrompt.includes('romantic')) {
+      return 'heart';
+    } else if (lowercasePrompt.includes('flower') || lowercasePrompt.includes('floral') || 
+               lowercasePrompt.includes('bloom') || lowercasePrompt.includes('petal')) {
+      return 'flower';
+    }
+    
+    return settings.objectType; // Default to current setting if no match
+  };
+
+  // Main pattern generation function
   const generatePattern = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     
     const ctx = canvas.getContext('2d');
     const dpr = window.devicePixelRatio || 1;
-    
     const rect = canvas.getBoundingClientRect();
+    
     canvas.width = rect.width * dpr;
     canvas.height = rect.height * dpr;
     ctx.scale(dpr, dpr);
     
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
+    // Call the appropriate pattern drawing function based on selected style
     patternStyles[settings.style](ctx, rect.width, rect.height, settings);
   };
 
@@ -89,9 +186,9 @@ const PatternGenerator = () => {
     
     setIsGenerating(true);
     setAiMode(true);
-    
     setGeneratedPrompts(prev => [prompt, ...prev.slice(0, 4)]);
-
+    
+    // Simulate AI processing with timeout
     setTimeout(() => {
       const newSettings = processPrompt(prompt);
       setSettings(newSettings);
@@ -103,21 +200,30 @@ const PatternGenerator = () => {
     }, 2000);
   };
 
+  // Process prompt to update pattern settings
   const processPrompt = (promptText) => {
     const lowercasePrompt = promptText.toLowerCase();
     const newSettings = { ...settings };
     
+    // Detect object type from prompt
+    newSettings.objectType = findObjectTypeFromPrompt(promptText);
+    
+    // Always enable objects for specific item prompts
+    if (newSettings.objectType !== settings.objectType) {
+      newSettings.showObjects = true;
+    }
+    
     // Enhanced style detection
     if (lowercasePrompt.includes('geometric') || lowercasePrompt.includes('crystal') || 
-        lowercasePrompt.includes('grid') || lowercasePrompt.includes('polygon') ||
+        lowercasePrompt.includes('grid') || lowercasePrompt.includes('polygon') || 
         lowercasePrompt.includes('mandala') || lowercasePrompt.includes('deco')) {
       newSettings.style = 'geometric';
     } else if (lowercasePrompt.includes('organic') || lowercasePrompt.includes('flow') || 
-               lowercasePrompt.includes('natural') || lowercasePrompt.includes('leaf') ||
+               lowercasePrompt.includes('natural') || lowercasePrompt.includes('leaf') || 
                lowercasePrompt.includes('wave') || lowercasePrompt.includes('bloom')) {
       newSettings.style = 'organic';
     } else if (lowercasePrompt.includes('abstract') || lowercasePrompt.includes('neural') || 
-               lowercasePrompt.includes('chaos') || lowercasePrompt.includes('watercolor') ||
+               lowercasePrompt.includes('chaos') || lowercasePrompt.includes('watercolor') || 
                lowercasePrompt.includes('splash') || lowercasePrompt.includes('random')) {
       newSettings.style = 'abstract';
     }
@@ -135,16 +241,46 @@ const PatternGenerator = () => {
     
     // Enhanced color detection
     const colorMappings = [
-      { keywords: ['blue', 'ocean', 'sky', 'azure', 'navy'], colors: ['#3B82F6', '#0EA5E9', '#1E40AF', '#0F766E'] },
-      { keywords: ['purple', 'violet', 'lavender', 'amethyst'], colors: ['#8B5CF6', '#7C3AED', '#581C87', '#6D28D9'] },
-      { keywords: ['green', 'jungle', 'forest', 'emerald', 'mint'], colors: ['#10B981', '#059669', '#047857', '#84CC16'] },
-      { keywords: ['red', 'crimson', 'ruby', 'rose'], colors: ['#EF4444', '#DC2626', '#B91C1C', '#EC4899'] },
-      { keywords: ['orange', 'sunset', 'amber', 'tangerine'], colors: ['#F59E0B', '#F97316', '#EA580C', '#FBBF24'] },
-      { keywords: ['gold', 'yellow', 'sunny', 'golden'], colors: ['#F59E0B', '#FBBF24', '#FCD34D', '#F3F4F6'] },
-      { keywords: ['pink', 'rose', 'blush', 'coral'], colors: ['#EC4899', '#F472B6', '#F9A8D4', '#FDF2F8'] },
-      { keywords: ['gray', 'grey', 'silver', 'slate'], colors: ['#6B7280', '#4B5563', '#374151', '#1F2937'] },
-      { keywords: ['black', 'dark', 'charcoal'], colors: ['#1F2937', '#111827', '#0F172A', '#374151'] },
-      { keywords: ['white', 'light', 'pearl', 'cream'], colors: ['#F9FAFB', '#F3F4F6', '#E5E7EB', '#D1D5DB'] }
+      { 
+        keywords: ['blue', 'ocean', 'sky', 'azure', 'navy'], 
+        colors: ['#3B82F6', '#0EA5E9', '#1E40AF', '#0F766E']
+      },
+      { 
+        keywords: ['purple', 'violet', 'lavender', 'amethyst'], 
+        colors: ['#8B5CF6', '#7C3AED', '#581C87', '#6D28D9']
+      },
+      { 
+        keywords: ['green', 'jungle', 'forest', 'emerald', 'mint'], 
+        colors: ['#10B981', '#059669', '#047857', '#84CC16']
+      },
+      { 
+        keywords: ['red', 'crimson', 'ruby', 'rose'], 
+        colors: ['#EF4444', '#DC2626', '#B91C1C', '#EC4899']
+      },
+      { 
+        keywords: ['orange', 'sunset', 'amber', 'tangerine'], 
+        colors: ['#F59E0B', '#F97316', '#EA580C', '#FBBF24']
+      },
+      { 
+        keywords: ['gold', 'yellow', 'sunny', 'golden'], 
+        colors: ['#F59E0B', '#FBBF24', '#FCD34D', '#F3F4F6']
+      },
+      { 
+        keywords: ['pink', 'rose', 'blush', 'coral'], 
+        colors: ['#EC4899', '#F472B6', '#F9A8D4', '#FDF2F8']
+      },
+      { 
+        keywords: ['gray', 'grey', 'silver', 'slate'], 
+        colors: ['#6B7280', '#4B5563', '#374151', '#1F2937']
+      },
+      { 
+        keywords: ['black', 'dark', 'charcoal'], 
+        colors: ['#1F2937', '#111827', '#0F172A', '#374151']
+      },
+      { 
+        keywords: ['white', 'light', 'pearl', 'cream'], 
+        colors: ['#F9FAFB', '#F3F4F6', '#E5E7EB', '#D1D5DB']
+      }
     ];
     
     let foundColors = [];
@@ -207,12 +343,12 @@ const PatternGenerator = () => {
 
   const handleRandomGenerate = () => {
     const randomPrompts = [
-      "Flowing cosmic nebula in deep space colors",
-      "Crystalline geometric formations with rainbow hues",
-      "Organic cellular structures in microscopic detail",
-      "Abstract expressionist paint strokes in bold colors",
-      "Minimalist zen garden patterns in earth tones",
-      "Fractal mathematics visualization in electric colors"
+      "Flowing cosmic nebula with teapots floating in space",
+      "Crystalline teapot formations with rainbow hues",
+      "Organic teapot garden with leafy patterns",
+      "Abstract teapot silhouettes in bold colors",
+      "Minimalist teapot line art in earth tones",
+      "Fractal teapot kaleidoscope in electric colors"
     ];
     
     const randomPrompt = randomPrompts[Math.floor(Math.random() * randomPrompts.length)];
@@ -239,6 +375,7 @@ const PatternGenerator = () => {
 
   const handleExport = async (format, settings) => {
     if (!canvasRef.current) return;
+    
     try {
       // Get the canvas element
       const canvas = canvasRef.current;
@@ -288,9 +425,13 @@ const PatternGenerator = () => {
     setShowColorPicker(false);
   };
 
-  // Enhanced pattern drawing functions
+  // Drawing functions for different pattern styles
   function drawGeometricPattern(ctx, width, height, settings) {
-    const { scale, complexity, rotation, noise, colors } = settings;
+    const { scale, complexity, rotation, noise, colors, showObjects, objectType } = settings;
+    
+    // Get object path data
+    const objectData = objectTypes.find(obj => obj.value === objectType)?.paths[0] || objectTypes[0].paths[0];
+    
     const cellSize = 35 * scale;
     const gridOffset = {
       x: (width % cellSize) / 2,
@@ -317,95 +458,102 @@ const PatternGenerator = () => {
         const shapeType = Math.floor(Math.random() * 8);
         const shapeComplexity = Math.max(3, Math.floor(Math.random() * complexity) + 3);
         
-        switch(shapeType) {
-          case 0: // Enhanced mandala
-            for (let layer = 0; layer < shapeComplexity; layer++) {
-              const radius = (cellSize/2) * (1 - layer/(shapeComplexity + 2));
-              ctx.beginPath();
-              ctx.arc(0, 0, radius, 0, 2 * Math.PI);
-              if (layer % 2 === 0) {
-                ctx.fill();
-              } else {
-                ctx.stroke();
-              }
-              
-              // Add decorative elements
-              for (let i = 0; i < 6; i++) {
-                const angle = (i * Math.PI) / 3;
+        if (showObjects && Math.random() > 0.7) {
+          // Draw the object (teapot, etc.) instead of a geometric shape
+          const objectScale = (cellSize / 24) * (0.8 + Math.random() * 0.4);
+          const objectRotation = Math.random() * 360;
+          drawSVGPath(ctx, objectData, 0, 0, objectScale, objectRotation, colors[colorIndex]);
+        } else {
+          // Draw geometric shapes
+          switch(shapeType) {
+            case 0: // Enhanced mandala
+              for (let layer = 0; layer < shapeComplexity; layer++) {
+                const radius = (cellSize/2) * (1 - layer/(shapeComplexity + 2));
                 ctx.beginPath();
-                ctx.moveTo(Math.cos(angle) * radius * 0.8, Math.sin(angle) * radius * 0.8);
-                ctx.lineTo(Math.cos(angle) * radius * 1.2, Math.sin(angle) * radius * 1.2);
-                ctx.stroke();
+                ctx.arc(0, 0, radius, 0, 2 * Math.PI);
+                if (layer % 2 === 0) {
+                  ctx.fill();
+                } else {
+                  ctx.stroke();
+                }
+                
+                // Add decorative elements
+                for (let i = 0; i < 6; i++) {
+                  const angle = (i * Math.PI) / 3;
+                  ctx.beginPath();
+                  ctx.moveTo(Math.cos(angle) * radius * 0.8, Math.sin(angle) * radius * 0.8);
+                  ctx.lineTo(Math.cos(angle) * radius * 1.2, Math.sin(angle) * radius * 1.2);
+                  ctx.stroke();
+                }
               }
-            }
-            break;
-            
-          case 1: // Multi-layered star
-            for (let layer = 0; layer < 3; layer++) {
+              break;
+              
+            case 1: // Multi-layered star
+              for (let layer = 0; layer < 3; layer++) {
+                ctx.beginPath();
+                const points = shapeComplexity + layer;
+                for (let i = 0; i < points * 2; i++) {
+                  const radius = (i % 2 === 0 ? cellSize/2 : cellSize/3) * (1 - layer * 0.2);
+                  const angle = (i * Math.PI) / points;
+                  const x = Math.cos(angle) * radius;
+                  const y = Math.sin(angle) * radius;
+                  i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+                }
+                ctx.closePath();
+                layer % 2 === 0 ? ctx.fill() : ctx.stroke();
+              }
+              break;
+              
+            case 2: // Hexagonal pattern
+              const hexRadius = cellSize/3;
+              for (let ring = 0; ring < 3; ring++) {
+                for (let i = 0; i < 6; i++) {
+                  ctx.beginPath();
+                  for (let j = 0; j < 6; j++) {
+                    const angle = (j * Math.PI) / 3;
+                    const radius = hexRadius * (1 + ring * 0.3);
+                    const x = Math.cos(angle) * radius + Math.cos(i * Math.PI / 3) * ring * hexRadius * 0.5;
+                    const y = Math.sin(angle) * radius + Math.sin(i * Math.PI / 3) * ring * hexRadius * 0.5;
+                    j === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+                  }
+                  ctx.closePath();
+                  ring % 2 === 0 ? ctx.stroke() : ctx.fill();
+                }
+              }
+              break;
+              
+            case 3: // Diamond grid
+              const diamond = cellSize / 4;
               ctx.beginPath();
-              const points = shapeComplexity + layer;
-              for (let i = 0; i < points * 2; i++) {
-                const radius = (i % 2 === 0 ? cellSize/2 : cellSize/3) * (1 - layer * 0.2);
-                const angle = (i * Math.PI) / points;
+              ctx.moveTo(0, -diamond);
+              ctx.lineTo(diamond, 0);
+              ctx.lineTo(0, diamond);
+              ctx.lineTo(-diamond, 0);
+              ctx.closePath();
+              ctx.fill();
+              
+              ctx.beginPath();
+              ctx.moveTo(0, -diamond * 0.6);
+              ctx.lineTo(diamond * 0.6, 0);
+              ctx.lineTo(0, diamond * 0.6);
+              ctx.lineTo(-diamond * 0.6, 0);
+              ctx.closePath();
+              ctx.stroke();
+              break;
+              
+            default: // Enhanced polygon with decorations
+              ctx.beginPath();
+              for (let i = 0; i < shapeComplexity; i++) {
+                const angle = (i * 2 * Math.PI) / shapeComplexity;
+                const radius = cellSize/3 + Math.sin(i * 2) * cellSize/8;
                 const x = Math.cos(angle) * radius;
                 const y = Math.sin(angle) * radius;
                 i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
               }
               ctx.closePath();
-              layer % 2 === 0 ? ctx.fill() : ctx.stroke();
-            }
-            break;
-            
-          case 2: // Hexagonal pattern
-            const hexRadius = cellSize/3;
-            for (let ring = 0; ring < 3; ring++) {
-              for (let i = 0; i < 6; i++) {
-                ctx.beginPath();
-                for (let j = 0; j < 6; j++) {
-                  const angle = (j * Math.PI) / 3;
-                  const radius = hexRadius * (1 + ring * 0.3);
-                  const x = Math.cos(angle) * radius + Math.cos(i * Math.PI / 3) * ring * hexRadius * 0.5;
-                  const y = Math.sin(angle) * radius + Math.sin(i * Math.PI / 3) * ring * hexRadius * 0.5;
-                  j === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-                }
-                ctx.closePath();
-                ring % 2 === 0 ? ctx.stroke() : ctx.fill();
-              }
-            }
-            break;
-            
-          case 3: // Diamond grid
-            const diamond = cellSize / 4;
-            ctx.beginPath();
-            ctx.moveTo(0, -diamond);
-            ctx.lineTo(diamond, 0);
-            ctx.lineTo(0, diamond);
-            ctx.lineTo(-diamond, 0);
-            ctx.closePath();
-            ctx.fill();
-            
-            ctx.beginPath();
-            ctx.moveTo(0, -diamond * 0.6);
-            ctx.lineTo(diamond * 0.6, 0);
-            ctx.lineTo(0, diamond * 0.6);
-            ctx.lineTo(-diamond * 0.6, 0);
-            ctx.closePath();
-            ctx.stroke();
-            break;
-            
-          default:
-            // Enhanced polygon with decorations
-            ctx.beginPath();
-            for (let i = 0; i < shapeComplexity; i++) {
-              const angle = (i * 2 * Math.PI) / shapeComplexity;
-              const radius = cellSize/3 + Math.sin(i * 2) * cellSize/8;
-              const x = Math.cos(angle) * radius;
-              const y = Math.sin(angle) * radius;
-              i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-            }
-            ctx.closePath();
-            ctx.fill();
-            ctx.stroke();
+              ctx.fill();
+              ctx.stroke();
+          }
         }
         
         ctx.restore();
@@ -414,9 +562,12 @@ const PatternGenerator = () => {
   }
 
   function drawOrganicPattern(ctx, width, height, settings) {
-    const { scale, complexity, rotation, noise, colors } = settings;
-    const cellSize = 40 * scale;
+    const { scale, complexity, rotation, noise, colors, showObjects, objectType } = settings;
     
+    // Get object path data
+    const objectData = objectTypes.find(obj => obj.value === objectType)?.paths[0] || objectTypes[0].paths[0];
+    
+    const cellSize = 40 * scale;
     ctx.lineWidth = 2 + scale;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
@@ -433,111 +584,131 @@ const PatternGenerator = () => {
         ctx.translate(x + cellSize/2, y + cellSize/2);
         ctx.rotate((rotation + Math.random() * noise * 360) * Math.PI / 180);
         
-        const shapeType = Math.floor(Math.random() * 6);
-        
-        switch(shapeType) {
-          case 0: // Enhanced organic blob
+        if (showObjects && Math.random() > 0.6) {
+          // Draw the object (teapot, etc.) instead of an organic shape
+          const objectScale = (cellSize / 24) * (0.8 + Math.random() * 0.4);
+          const objectRotation = Math.random() * 360;
+          drawSVGPath(ctx, objectData, 0, 0, objectScale, objectRotation, colors[colorIndex]);
+          
+          // Add some organic embellishments around the object
+          const embellishmentCount = Math.floor(Math.random() * 5) + 3;
+          for (let i = 0; i < embellishmentCount; i++) {
+            const angle = (i * 2 * Math.PI) / embellishmentCount;
+            const distance = cellSize * 0.3 * (0.8 + Math.random() * 0.4);
+            const embX = Math.cos(angle) * distance;
+            const embY = Math.sin(angle) * distance;
+            
             ctx.beginPath();
-            const points = complexity + 4;
-            for (let i = 0; i <= points; i++) {
-              const angle = (i * 2 * Math.PI) / points;
-              const radiusVariation = 0.6 + Math.random() * 0.8 + Math.sin(i * 3) * 0.3;
-              const radius = (cellSize/3) * radiusVariation;
-              const x = Math.cos(angle) * radius;
-              const y = Math.sin(angle) * radius;
-              
-              if (i === 0) {
-                ctx.moveTo(x, y);
-              } else {
-                const prevAngle = ((i-1) * 2 * Math.PI) / points;
-                const prevRadius = (cellSize/3) * (0.6 + Math.random() * 0.8);
-                const prevX = Math.cos(prevAngle) * prevRadius;
-                const prevY = Math.sin(prevAngle) * prevRadius;
+            ctx.arc(embX, embY, cellSize * 0.05, 0, 2 * Math.PI);
+            ctx.fill();
+          }
+        } else {
+          const shapeType = Math.floor(Math.random() * 6);
+          
+          switch(shapeType) {
+            case 0: // Enhanced organic blob
+              ctx.beginPath();
+              const points = complexity + 4;
+              for (let i = 0; i <= points; i++) {
+                const angle = (i * 2 * Math.PI) / points;
+                const radiusVariation = 0.6 + Math.random() * 0.8 + Math.sin(i * 3) * 0.3;
+                const radius = (cellSize/3) * radiusVariation;
+                const x = Math.cos(angle) * radius;
+                const y = Math.sin(angle) * radius;
                 
-                const cp1X = prevX + (Math.random() - 0.5) * cellSize/4;
-                const cp1Y = prevY + (Math.random() - 0.5) * cellSize/4;
-                const cp2X = x + (Math.random() - 0.5) * cellSize/4;
-                const cp2Y = y + (Math.random() - 0.5) * cellSize/4;
-                
-                ctx.bezierCurveTo(cp1X, cp1Y, cp2X, cp2Y, x, y);
+                if (i === 0) {
+                  ctx.moveTo(x, y);
+                } else {
+                  const prevAngle = ((i-1) * 2 * Math.PI) / points;
+                  const prevRadius = (cellSize/3) * (0.6 + Math.random() * 0.8);
+                  const prevX = Math.cos(prevAngle) * prevRadius;
+                  const prevY = Math.sin(prevAngle) * prevRadius;
+                  
+                  const cp1X = prevX + (Math.random() - 0.5) * cellSize/4;
+                  const cp1Y = prevY + (Math.random() - 0.5) * cellSize/4;
+                  const cp2X = x + (Math.random() - 0.5) * cellSize/4;
+                  const cp2Y = y + (Math.random() - 0.5) * cellSize/4;
+                  
+                  ctx.bezierCurveTo(cp1X, cp1Y, cp2X, cp2Y, x, y);
+                }
               }
-            }
-            ctx.closePath();
-            ctx.fill();
-            ctx.stroke();
-            break;
-            
-          case 1: // Flower petals
-            const petalCount = complexity;
-            for (let i = 0; i < petalCount; i++) {
-              ctx.save();
-              ctx.rotate((i * 2 * Math.PI) / petalCount);
-              
-              // Petal shape
-              ctx.beginPath();
-              ctx.ellipse(0, cellSize/4, cellSize/6, cellSize/3, 0, 0, 2 * Math.PI);
+              ctx.closePath();
               ctx.fill();
+              ctx.stroke();
+              break;
               
-              // Petal detail
+            case 1: // Flower petals
+              const petalCount = complexity;
+              for (let i = 0; i < petalCount; i++) {
+                ctx.save();
+                ctx.rotate((i * 2 * Math.PI) / petalCount);
+                
+                // Petal shape
+                ctx.beginPath();
+                ctx.ellipse(0, cellSize/4, cellSize/6, cellSize/3, 0, 0, 2 * Math.PI);
+                ctx.fill();
+                
+                // Petal detail
+                ctx.beginPath();
+                ctx.moveTo(0, cellSize/8);
+                ctx.quadraticCurveTo(cellSize/12, cellSize/3, 0, cellSize/2);
+                ctx.stroke();
+                
+                ctx.restore();
+              }
+              
+              // Center
               ctx.beginPath();
-              ctx.moveTo(0, cellSize/8);
-              ctx.quadraticCurveTo(cellSize/12, cellSize/3, 0, cellSize/2);
+              ctx.arc(0, 0, cellSize/8, 0, 2 * Math.PI);
+              ctx.fill();
+              break;
+              
+            case 2: // Flowing wave
+              ctx.beginPath();
+              const waveLength = cellSize;
+              const amplitude = cellSize/4;
+              const frequency = complexity / 2;
+              
+              for (let i = 0; i < waveLength; i += 2) {
+                const x = i - waveLength/2;
+                const y = Math.sin((i / waveLength) * Math.PI * frequency) * amplitude;
+                const y2 = Math.cos((i / waveLength) * Math.PI * frequency * 1.5) * amplitude * 0.7;
+                
+                i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+                ctx.lineTo(x, y2);
+              }
               ctx.stroke();
               
-              ctx.restore();
-            }
-            
-            // Center
-            ctx.beginPath();
-            ctx.arc(0, 0, cellSize/8, 0, 2 * Math.PI);
-            ctx.fill();
-            break;
-            
-          case 2: // Flowing wave
-            ctx.beginPath();
-            const waveLength = cellSize;
-            const amplitude = cellSize/4;
-            const frequency = complexity / 2;
-            
-            for (let i = 0; i < waveLength; i += 2) {
-              const x = i - waveLength/2;
-              const y = Math.sin((i / waveLength) * Math.PI * frequency) * amplitude;
-              const y2 = Math.cos((i / waveLength) * Math.PI * frequency * 1.5) * amplitude * 0.7;
+              // Add flowing particles
+              for (let i = 0; i < complexity; i++) {
+                const particleX = (Math.random() - 0.5) * cellSize;
+                const particleY = (Math.random() - 0.5) * cellSize;
+                
+                ctx.beginPath();
+                ctx.arc(particleX, particleY, 2 + Math.random() * 3, 0, 2 * Math.PI);
+                ctx.fill();
+              }
+              break;
               
-              i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-              ctx.lineTo(x, y2);
-            }
-            ctx.stroke();
-            
-            // Add flowing particles
-            for (let i = 0; i < complexity; i++) {
-              const particleX = (Math.random() - 0.5) * cellSize;
-              const particleY = (Math.random() - 0.5) * cellSize;
+            default: // Leaf pattern
               ctx.beginPath();
-              ctx.arc(particleX, particleY, 2 + Math.random() * 3, 0, 2 * Math.PI);
+              ctx.ellipse(0, 0, cellSize/4, cellSize/2, 0, 0, 2 * Math.PI);
               ctx.fill();
-            }
-            break;
-            
-          default:
-            // Leaf pattern
-            ctx.beginPath();
-            ctx.ellipse(0, 0, cellSize/4, cellSize/2, 0, 0, 2 * Math.PI);
-            ctx.fill();
-            
-            // Leaf veins
-            ctx.beginPath();
-            ctx.moveTo(0, -cellSize/2);
-            ctx.quadraticCurveTo(0, 0, 0, cellSize/2);
-            ctx.stroke();
-            
-            for (let vein = 1; vein <= complexity/2; vein++) {
-              const veinY = (-cellSize/2) + (vein * cellSize / complexity);
+              
+              // Leaf veins
               ctx.beginPath();
-              ctx.moveTo(-cellSize/8, veinY);
-              ctx.quadraticCurveTo(0, veinY + cellSize/16, cellSize/8, veinY);
+              ctx.moveTo(0, -cellSize/2);
+              ctx.quadraticCurveTo(0, 0, 0, cellSize/2);
               ctx.stroke();
-            }
+              
+              for (let vein = 1; vein <= complexity/2; vein++) {
+                const veinY = (-cellSize/2) + (vein * cellSize / complexity);
+                ctx.beginPath();
+                ctx.moveTo(-cellSize/8, veinY);
+                ctx.quadraticCurveTo(0, veinY + cellSize/16, cellSize/8, veinY);
+                ctx.stroke();
+              }
+          }
         }
         
         ctx.restore();
@@ -546,7 +717,10 @@ const PatternGenerator = () => {
   }
 
   function drawAbstractPattern(ctx, width, height, settings) {
-    const { scale, complexity, rotation, noise, colors } = settings;
+    const { scale, complexity, rotation, noise, colors, showObjects, objectType } = settings;
+    
+    // Get object path data
+    const objectData = objectTypes.find(obj => obj.value === objectType)?.paths[0] || objectTypes[0].paths[0];
     
     ctx.lineWidth = 2 + scale * 2;
     ctx.lineCap = 'round';
@@ -573,112 +747,141 @@ const PatternGenerator = () => {
       ctx.translate(x, y);
       ctx.rotate((rotation + Math.random() * noise * 720) * Math.PI / 180);
       
-      ctx.fillStyle = colors[colorIndex] + alpha.toString(16).padStart(2, '0');
-      ctx.strokeStyle = colors[(colorIndex + 2) % colors.length] + 'BB';
-      
-      const shapeType = Math.floor(Math.random() * 8);
-      
-      switch(shapeType) {
-        case 0: // Flowing brush stroke
-          ctx.beginPath();
-          const segments = 8;
-          for (let j = 0; j < segments; j++) {
-            const segmentX = (-size/2) + (j * size/segments);
-            const segmentY = Math.sin(j + rotation/50) * size/3 + (Math.random() - 0.5) * size/4;
-            const controlX = segmentX + size/8;
-            const controlY = segmentY + (Math.random() - 0.5) * size/6;
-            
-            j === 0 ? ctx.moveTo(segmentX, segmentY) : ctx.quadraticCurveTo(controlX, controlY, segmentX, segmentY);
-          }
-          ctx.stroke();
-          break;
-          
-        case 1: // Gradient circle
-          const circleGradient = ctx.createRadialGradient(0, 0, 0, 0, 0, size/2);
-          circleGradient.addColorStop(0, colors[colorIndex] + 'DD');
-          circleGradient.addColorStop(1, colors[colorIndex] + '22');
-          ctx.fillStyle = circleGradient;
+      if (showObjects && Math.random() > 0.7) {
+        // Draw the object (teapot, etc.) instead of an abstract shape
+        const objectScale = (size / 24) * (0.8 + Math.random() * 0.4);
+        const objectRotation = Math.random() * 360;
+        drawSVGPath(ctx, objectData, 0, 0, objectScale, objectRotation, colors[colorIndex]);
+        
+        // Add some abstract embellishments around the object
+        ctx.beginPath();
+        ctx.arc(0, 0, size * 0.6, 0, 2 * Math.PI);
+        ctx.strokeStyle = colors[colorIndex] + '40';
+        ctx.stroke();
+        
+        // Add random dots around
+        for (let d = 0; d < 8; d++) {
+          const dotAngle = (d * Math.PI / 4) + Math.random() * 0.5;
+          const dotDist = size * (0.3 + Math.random() * 0.4);
+          const dotX = Math.cos(dotAngle) * dotDist;
+          const dotY = Math.sin(dotAngle) * dotDist;
           
           ctx.beginPath();
-          ctx.arc(0, 0, size/2, 0, 2 * Math.PI);
+          ctx.arc(dotX, dotY, 2 + Math.random() * 4, 0, 2 * Math.PI);
+          ctx.fillStyle = colors[(colorIndex + 1) % colors.length] + '80';
           ctx.fill();
-          break;
-          
-        case 2: // Triangular burst
-          const triangles = 6;
-          for (let t = 0; t < triangles; t++) {
-            ctx.save();
-            ctx.rotate((t * 2 * Math.PI) / triangles);
+        }
+      } else {
+        ctx.fillStyle = colors[colorIndex] + alpha.toString(16).padStart(2, '0');
+        ctx.strokeStyle = colors[(colorIndex + 2) % colors.length] + 'BB';
+        
+        const shapeType = Math.floor(Math.random() * 8);
+        
+        switch(shapeType) {
+          case 0: // Flowing brush stroke
+            ctx.beginPath();
+            const segments = 8;
+            for (let j = 0; j < segments; j++) {
+              const segmentX = (-size/2) + (j * size/segments);
+              const segmentY = Math.sin(j + rotation/50) * size/3 + (Math.random() - 0.5) * size/4;
+              const controlX = segmentX + size/8;
+              const controlY = segmentY + (Math.random() - 0.5) * size/6;
+              
+              j === 0 ? ctx.moveTo(segmentX, segmentY) : ctx.quadraticCurveTo(controlX, controlY, segmentX, segmentY);
+            }
+            ctx.stroke();
+            break;
+            
+          case 1: // Gradient circle
+            const circleGradient = ctx.createRadialGradient(0, 0, 0, 0, 0, size/2);
+            circleGradient.addColorStop(0, colors[colorIndex] + 'DD');
+            circleGradient.addColorStop(1, colors[colorIndex] + '22');
+            ctx.fillStyle = circleGradient;
             
             ctx.beginPath();
-            ctx.moveTo(0, 0);
-            ctx.lineTo(size/4, -size/2);
-            ctx.lineTo(-size/4, -size/2);
+            ctx.arc(0, 0, size/2, 0, 2 * Math.PI);
+            ctx.fill();
+            break;
+            
+          case 2: // Triangular burst
+            const triangles = 6;
+            for (let t = 0; t < triangles; t++) {
+              ctx.save();
+              ctx.rotate((t * 2 * Math.PI) / triangles);
+              
+              ctx.beginPath();
+              ctx.moveTo(0, 0);
+              ctx.lineTo(size/4, -size/2);
+              ctx.lineTo(-size/4, -size/2);
+              ctx.closePath();
+              ctx.fill();
+              
+              ctx.restore();
+            }
+            break;
+            
+          case 3: // Spiral
+            ctx.beginPath();
+            const spiralTurns = 3;
+            const spiralPoints = 50;
+            
+            for (let s = 0; s < spiralPoints; s++) {
+              const spiralAngle = (s / spiralPoints) * Math.PI * 2 * spiralTurns;
+              const spiralRadius = (s / spiralPoints) * size/2;
+              const spiralX = Math.cos(spiralAngle) * spiralRadius;
+              const spiralY = Math.sin(spiralAngle) * spiralRadius;
+              
+              s === 0 ? ctx.moveTo(spiralX, spiralY) : ctx.lineTo(spiralX, spiralY);
+            }
+            ctx.stroke();
+            break;
+            
+          case 4: // Energy burst
+            const rays = 12;
+            for (let r = 0; r < rays; r++) {
+              const rayAngle = (r * 2 * Math.PI) / rays;
+              const rayLength = size/3 + Math.random() * size/2;
+              
+              ctx.beginPath();
+              ctx.moveTo(0, 0);
+              ctx.lineTo(Math.cos(rayAngle) * rayLength, Math.sin(rayAngle) * rayLength);
+              
+              // Add secondary rays
+              ctx.lineTo(
+                Math.cos(rayAngle + 0.2) * rayLength * 0.7,
+                Math.sin(rayAngle + 0.2) * rayLength * 0.7
+              );
+              ctx.stroke();
+            }
+            break;
+            
+          default: // Complex bezier shape
+            ctx.beginPath();
+            const bezierPoints = 6;
+            
+            for (let b = 0; b < bezierPoints; b++) {
+              const angle1 = (b * 2 * Math.PI) / bezierPoints;
+              const angle2 = ((b + 1) * 2 * Math.PI) / bezierPoints;
+              
+              const x1 = Math.cos(angle1) * size/3;
+              const y1 = Math.sin(angle1) * size/3;
+              const x2 = Math.cos(angle2) * size/3;
+              const y2 = Math.sin(angle2) * size/3;
+              
+              const cp1x = x1 + (Math.random() - 0.5) * size/2;
+              const cp1y = y1 + (Math.random() - 0.5) * size/2;
+              const cp2x = x2 + (Math.random() - 0.5) * size/2;
+              const cp2y = y2 + (Math.random() - 0.5) * size/2;
+              
+              if (b === 0) {
+                ctx.moveTo(x1, y1);
+              }
+              ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, x2, y2);
+            }
             ctx.closePath();
             ctx.fill();
-            
-            ctx.restore();
-          }
-          break;
-          
-        case 3: // Spiral
-          ctx.beginPath();
-          const spiralTurns = 3;
-          const spiralPoints = 50;
-          for (let s = 0; s < spiralPoints; s++) {
-            const spiralAngle = (s / spiralPoints) * Math.PI * 2 * spiralTurns;
-            const spiralRadius = (s / spiralPoints) * size/2;
-            const spiralX = Math.cos(spiralAngle) * spiralRadius;
-            const spiralY = Math.sin(spiralAngle) * spiralRadius;
-            s === 0 ? ctx.moveTo(spiralX, spiralY) : ctx.lineTo(spiralX, spiralY);
-          }
-          ctx.stroke();
-          break;
-          
-        case 4: // Energy burst
-          const rays = 12;
-          for (let r = 0; r < rays; r++) {
-            const rayAngle = (r * 2 * Math.PI) / rays;
-            const rayLength = size/3 + Math.random() * size/2;
-            
-            ctx.beginPath();
-            ctx.moveTo(0, 0);
-            ctx.lineTo(Math.cos(rayAngle) * rayLength, Math.sin(rayAngle) * rayLength);
-            
-            // Add secondary rays
-            ctx.lineTo(
-              Math.cos(rayAngle + 0.2) * rayLength * 0.7,
-              Math.sin(rayAngle + 0.2) * rayLength * 0.7
-            );
             ctx.stroke();
-          }
-          break;
-          
-        default: // Complex bezier shape
-          ctx.beginPath();
-          const bezierPoints = 6;
-          for (let b = 0; b < bezierPoints; b++) {
-            const angle1 = (b * 2 * Math.PI) / bezierPoints;
-            const angle2 = ((b + 1) * 2 * Math.PI) / bezierPoints;
-            
-            const x1 = Math.cos(angle1) * size/3;
-            const y1 = Math.sin(angle1) * size/3;
-            const x2 = Math.cos(angle2) * size/3;
-            const y2 = Math.sin(angle2) * size/3;
-            
-            const cp1x = x1 + (Math.random() - 0.5) * size/2;
-            const cp1y = y1 + (Math.random() - 0.5) * size/2;
-            const cp2x = x2 + (Math.random() - 0.5) * size/2;
-            const cp2y = y2 + (Math.random() - 0.5) * size/2;
-            
-            if (b === 0) {
-              ctx.moveTo(x1, y1);
-            }
-            ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, x2, y2);
-          }
-          ctx.closePath();
-          ctx.fill();
-          ctx.stroke();
+        }
       }
       
       ctx.restore();
@@ -708,20 +911,15 @@ const PatternGenerator = () => {
     const { x, y, size, duration, delay } = element;
     
     return (
-      <motion.div
+      <motion.div 
         className="absolute pointer-events-none opacity-20"
-        style={{
-          left: `${x}%`,
-          top: `${y}%`,
-          width: size,
-          height: size
-        }}
-        animate={{
+        style={{ left: `${x}%`, top: `${y}%`, width: size, height: size }}
+        animate={{ 
           y: [-10, 10, -10],
           rotate: [0, 360],
           scale: [0.8, 1.2, 0.8]
         }}
-        transition={{
+        transition={{ 
           duration: duration,
           repeat: Infinity,
           ease: "easeInOut",
@@ -730,9 +928,7 @@ const PatternGenerator = () => {
       >
         <div 
           className="w-full h-full rounded-full bg-gradient-to-br from-primary-400/30 to-purple-400/30 backdrop-blur-sm"
-          style={{
-            background: `linear-gradient(135deg, ${settings.colors[0]}20, ${settings.colors[1]}20)`
-          }}
+          style={{ background: `linear-gradient(135deg, ${settings.colors[0]}20, ${settings.colors[1]}20)` }}
         />
       </motion.div>
     );
@@ -769,7 +965,10 @@ const PatternGenerator = () => {
                 transition={{ duration: 0.5, repeat: aiMode ? Infinity : 0 }}
               >
                 <div className="w-16 h-16 bg-gradient-to-br from-blue-500 via-purple-600 to-pink-600 rounded-2xl flex items-center justify-center shadow-neu-button">
-                  <SafeIcon icon={isGenerating ? FiLoader : FiCpu} className={`w-8 h-8 text-white ${isGenerating ? 'animate-spin' : ''}`} />
+                  <SafeIcon 
+                    icon={isGenerating ? FiLoader : FiCpu} 
+                    className={`w-8 h-8 text-white ${isGenerating ? 'animate-spin' : ''}`} 
+                  />
                 </div>
                 {aiMode && (
                   <motion.div 
@@ -783,13 +982,22 @@ const PatternGenerator = () => {
               <div className="flex-1">
                 <h3 className="text-2xl font-bold text-gray-900 mb-2 flex items-center">
                   AI Pattern Generator
-                  <motion.div
+                  <motion.div 
                     className="ml-3 px-3 py-1 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-sm rounded-full"
                     animate={aiMode ? { scale: [1, 1.05, 1] } : {}}
                     transition={{ duration: 0.5, repeat: aiMode ? Infinity : 0 }}
                   >
                     {isGenerating ? 'Generating...' : 'Ready'}
                   </motion.div>
+                  
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setShowHelpModal(true)}
+                    className="ml-2 p-1 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
+                  >
+                    <SafeIcon icon={FiInfo} className="w-4 h-4 text-gray-600" />
+                  </motion.button>
                 </h3>
                 <p className="text-gray-600">
                   Describe your vision and watch AI bring it to life with stunning patterns
@@ -799,10 +1007,10 @@ const PatternGenerator = () => {
             
             <form onSubmit={handlePromptSubmit} className="mb-6">
               <div className="relative">
-                <input
+                <input 
                   type="text"
                   className="w-full px-6 py-4 pr-16 text-lg bg-white/80 backdrop-blur-sm border-2 border-gray-200/50 rounded-2xl shadow-neu-pressed-sm focus:shadow-neu-ring focus:border-primary-300 outline-none transition-all duration-300 text-gray-800 placeholder-gray-500"
-                  placeholder="e.g. flowing ocean waves with turquoise and deep blue gradients..."
+                  placeholder="e.g. teapot pattern with blue and gold accents..."
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
                   disabled={isGenerating}
@@ -845,7 +1053,57 @@ const PatternGenerator = () => {
                 <SafeIcon icon={FiRefreshCcw} className="w-4 h-4" />
                 <span>Regenerate</span>
               </motion.button>
+              
+              <motion.button
+                whileHover={{ scale: 1.02, y: -2 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => setSettings({ ...settings, showObjects: !settings.showObjects })}
+                className={`flex items-center space-x-2 px-4 py-2 rounded-xl shadow-neu-button hover:shadow-neu-flat transition-all duration-200 ${
+                  settings.showObjects ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-700'
+                }`}
+              >
+                <SafeIcon icon={settings.showObjects ? FiCheck : FiTarget} className="w-4 h-4" />
+                <span>{settings.showObjects ? 'Objects On' : 'Objects Off'}</span>
+              </motion.button>
             </div>
+            
+            {/* Object Type Selection */}
+            {settings.showObjects && (
+              <motion.div 
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="mb-6"
+              >
+                <p className="text-sm font-semibold text-gray-700 mb-3 flex items-center">
+                  <SafeIcon icon={FiTarget} className="w-4 h-4 mr-2 text-blue-500" />
+                  Choose Object Type
+                </p>
+                
+                <div className="flex flex-wrap gap-2">
+                  {objectTypes.map((objType) => (
+                    <motion.button
+                      key={objType.value}
+                      whileHover={{ scale: 1.05, y: -2 }}
+                      whileTap={{ scale: 0.95 }}
+                      className={`px-4 py-2 rounded-xl transition-all duration-200 flex items-center ${
+                        settings.objectType === objType.value
+                          ? 'bg-primary-600 text-white shadow-neu-button-pressed'
+                          : 'bg-white shadow-neu-flat-sm hover:shadow-neu-button text-gray-700'
+                      }`}
+                      onClick={() => setSettings({ ...settings, objectType: objType.value })}
+                    >
+                      {objType.value === 'teapot' ? (
+                        <SafeIcon icon={FiCoffee} className="w-4 h-4 mr-2" />
+                      ) : (
+                        <span className="w-4 h-4 mr-2 inline-block"></span>
+                      )}
+                      <span>{objType.label}</span>
+                    </motion.button>
+                  ))}
+                </div>
+              </motion.div>
+            )}
             
             {/* Prompt Suggestions - Enhanced */}
             <div className="mb-4">
@@ -854,15 +1112,16 @@ const PatternGenerator = () => {
                   <SafeIcon icon={FiStar} className="w-4 h-4 mr-2 text-yellow-500" />
                   Trending Prompts
                 </p>
+                
                 <motion.button
                   onClick={() => {
                     const newSuggestions = [
-                      "Crystalline ice formations with arctic blue tones",
-                      "Volcanic lava flows in red and orange gradients",
-                      "Galaxy spiral with cosmic purple and silver",
-                      "Bamboo forest pattern in zen green shades",
-                      "Lightning storm abstract in electric blue",
-                      "Desert sand dunes in warm earth tones"
+                      "Crystalline teapot formations with arctic blue tones",
+                      "Vintage teapot collection in warm earth tones",
+                      "Galaxy teapot pattern with cosmic purple and silver",
+                      "Minimalist teapot line art in monochrome",
+                      "Floral teapot design with spring colors",
+                      "Art deco teapot pattern with geometric shapes"
                     ];
                     setPromptSuggestions(newSuggestions);
                   }}
@@ -893,7 +1152,7 @@ const PatternGenerator = () => {
             
             {/* Recent Prompts - Enhanced */}
             {generatedPrompts.length > 0 && (
-              <motion.div
+              <motion.div 
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
                 className="border-t border-gray-200/50 pt-4"
@@ -902,6 +1161,7 @@ const PatternGenerator = () => {
                   <SafeIcon icon={FiTrendingUp} className="w-4 h-4 mr-2 text-green-500" />
                   Your Recent Creations
                 </p>
+                
                 <div className="flex flex-wrap gap-2">
                   {generatedPrompts.map((genPrompt, index) => (
                     <motion.button
@@ -925,7 +1185,7 @@ const PatternGenerator = () => {
         </motion.div>
         
         {/* Pattern Generator UI - Enhanced with deeper neumorphic layers */}
-        <motion.div
+        <motion.div 
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.8 }}
@@ -942,13 +1202,14 @@ const PatternGenerator = () => {
             <div className="bg-gradient-to-r from-gray-50/80 via-white/90 to-gray-50/80 backdrop-blur-sm px-8 py-6 border-b border-gray-200/50">
               <div className="flex justify-between items-center">
                 <div className="flex items-center">
-                  <motion.div
+                  <motion.div 
                     className="w-12 h-12 bg-gradient-to-br from-primary-500 via-purple-500 to-pink-500 rounded-xl flex items-center justify-center mr-4 shadow-neu-button"
                     animate={isGenerating ? { rotate: 360 } : {}}
                     transition={{ duration: 2, repeat: isGenerating ? Infinity : 0, ease: "linear" }}
                   >
                     <SafeIcon icon={FiLayers} className="w-6 h-6 text-white" />
                   </motion.div>
+                  
                   <div>
                     <h2 className="text-3xl font-bold text-gray-900 mb-1">Pattern Studio</h2>
                     <p className="text-gray-600 text-sm">Create and customize your pattern</p>
@@ -983,7 +1244,7 @@ const PatternGenerator = () => {
             <div className="p-8 bg-gradient-to-br from-gray-50/50 via-white/30 to-gray-50/50">
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div className="lg:col-span-2">
-                  <motion.div
+                  <motion.div 
                     className="relative group"
                     whileHover={{ scale: 1.01 }}
                     transition={{ duration: 0.3 }}
@@ -993,9 +1254,9 @@ const PatternGenerator = () => {
                     <div className="absolute -inset-1 bg-white rounded-2xl shadow-neu-pressed transform -rotate-1 group-hover:rotate-0 transition-transform duration-300" />
                     
                     <canvas 
-                      ref={canvasRef} 
-                      className="relative w-full h-[500px] rounded-2xl shadow-neu-flat bg-white border-4 border-white/90 transition-all duration-300 group-hover:shadow-neu-card" 
-                      style={{ 
+                      ref={canvasRef}
+                      className="relative w-full h-[500px] rounded-2xl shadow-neu-flat bg-white border-4 border-white/90 transition-all duration-300 group-hover:shadow-neu-card"
+                      style={{
                         background: 'linear-gradient(135deg, #fafafa 0%, #ffffff 100%)',
                         boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.05)'
                       }}
@@ -1016,7 +1277,7 @@ const PatternGenerator = () => {
                                 rotate: 360,
                                 scale: [1, 1.1, 1]
                               }}
-                              transition={{ 
+                              transition={{
                                 rotate: { duration: 2, repeat: Infinity, ease: "linear" },
                                 scale: { duration: 1, repeat: Infinity, ease: "easeInOut" }
                               }}
@@ -1056,6 +1317,7 @@ const PatternGenerator = () => {
                         <label className="block text-sm font-semibold text-gray-700 mb-3">
                           Style
                         </label>
+                        
                         <div className="relative">
                           <motion.button
                             whileTap={{ scale: 0.98 }}
@@ -1064,13 +1326,14 @@ const PatternGenerator = () => {
                           >
                             <div className="flex items-center">
                               <SafeIcon 
-                                icon={styleOptions.find(opt => opt.value === settings.style)?.icon} 
-                                className="w-5 h-5 mr-3 text-primary-600" 
+                                icon={styleOptions.find(opt => opt.value === settings.style)?.icon}
+                                className="w-5 h-5 mr-3 text-primary-600"
                               />
                               <span className="font-medium">
                                 {styleOptions.find(opt => opt.value === settings.style)?.label}
                               </span>
                             </div>
+                            
                             <motion.div
                               animate={{ rotate: dropdownOpen ? 180 : 0 }}
                               transition={{ duration: 0.2 }}
@@ -1119,6 +1382,7 @@ const PatternGenerator = () => {
                             <label className="block text-sm font-semibold text-gray-700">
                               {label} ({(settings[key] * multiplier).toFixed(key === 'scale' ? 1 : 0)}{suffix})
                             </label>
+                            
                             <div className="relative">
                               <input
                                 type="range"
@@ -1128,9 +1392,7 @@ const PatternGenerator = () => {
                                 value={settings[key]}
                                 onChange={(e) => setSettings({ ...settings, [key]: Number(e.target.value) })}
                                 className="w-full h-3 rounded-full appearance-none cursor-pointer bg-gradient-to-r from-gray-200 to-gray-300 shadow-neu-pressed-sm slider"
-                                style={{
-                                  background: `linear-gradient(to right, ${settings.colors[0]}40 0%, ${settings.colors[1]}40 100%)`
-                                }}
+                                style={{ background: `linear-gradient(to right, ${settings.colors[0]}40 0%, ${settings.colors[1]}40 100%)` }}
                               />
                             </div>
                           </div>
@@ -1142,6 +1404,7 @@ const PatternGenerator = () => {
                         <label className="block text-sm font-semibold text-gray-700 mb-4">
                           Color Palette
                         </label>
+                        
                         <div className="flex flex-wrap gap-3 mb-4">
                           {settings.colors.map((color, index) => (
                             <motion.div
@@ -1157,12 +1420,11 @@ const PatternGenerator = () => {
                             >
                               <div 
                                 className="absolute inset-0 bg-gradient-to-br opacity-50"
-                                style={{ 
-                                  background: `linear-gradient(135deg, ${color}80, ${color}FF)` 
-                                }}
+                                style={{ background: `linear-gradient(135deg, ${color}80, ${color}FF)` }}
                               />
                             </motion.div>
                           ))}
+                          
                           <motion.button
                             whileHover={{ scale: 1.1, y: -2 }}
                             whileTap={{ scale: 0.9 }}
@@ -1206,6 +1468,7 @@ const PatternGenerator = () => {
                                   onChange={(e) => handleColorChange(selectedColorIndex, e.target.value)}
                                   value={settings.colors[selectedColorIndex]}
                                 />
+                                
                                 <motion.button
                                   whileHover={{ scale: 1.05 }}
                                   whileTap={{ scale: 0.95 }}
@@ -1226,137 +1489,276 @@ const PatternGenerator = () => {
             </div>
           </div>
         </motion.div>
-        
-        {/* Export Modal */}
-        <AnimatePresence>
-          {showExportModal && (
+      </div>
+      
+      {/* Help Modal */}
+      <AnimatePresence>
+        {showHelpModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30 backdrop-blur-md"
+            onClick={() => setShowHelpModal(false)}
+          >
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30 backdrop-blur-md"
-              onClick={() => setShowExportModal(false)}
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              className="relative max-w-lg w-full bg-white/90 backdrop-blur-sm rounded-2xl overflow-hidden shadow-neu-card border border-white/50"
+              onClick={e => e.stopPropagation()}
             >
-              <motion.div
-                initial={{ scale: 0.95, opacity: 0, y: 20 }}
-                animate={{ scale: 1, opacity: 1, y: 0 }}
-                exit={{ scale: 0.95, opacity: 0, y: 20 }}
-                className="relative max-w-lg w-full bg-white/90 backdrop-blur-sm rounded-2xl overflow-hidden shadow-neu-card border border-white/50"
-                onClick={e => e.stopPropagation()}
-              >
-                {/* Modal Header */}
-                <div className="bg-gradient-to-r from-primary-500/10 to-purple-500/10 p-6 border-b border-gray-200/50">
+              <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 p-6 border-b border-gray-200/50">
+                <div className="flex items-center justify-between">
                   <div className="flex items-center">
-                    <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-purple-600 rounded-xl flex items-center justify-center shadow-neu-button mr-4">
-                      <SafeIcon icon={FiDownload} className="w-6 h-6 text-white" />
+                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-neu-button mr-4">
+                      <SafeIcon icon={FiInfo} className="w-5 h-5 text-white" />
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-900">How Pattern Generator Works</h3>
+                  </div>
+                  
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={() => setShowHelpModal(false)}
+                    className="p-2 rounded-full bg-white/80 text-gray-600 hover:bg-white transition-colors"
+                  >
+                    <SafeIcon icon={FiX} className="w-5 h-5" />
+                  </motion.button>
+                </div>
+              </div>
+              
+              <div className="p-6 max-h-[70vh] overflow-y-auto">
+                <div className="space-y-6">
+                  <div>
+                    <h4 className="text-lg font-semibold text-gray-900 mb-2 flex items-center">
+                      <SafeIcon icon={FiSend} className="w-5 h-5 mr-2 text-blue-500" />
+                      Using Prompts
+                    </h4>
+                    <p className="text-gray-700 mb-2">
+                      Type descriptive prompts to generate patterns. Include:
+                    </p>
+                    <ul className="list-disc pl-6 text-gray-600 space-y-1">
+                      <li>Objects you want to see (teapots, cups, stars, etc.)</li>
+                      <li>Colors you prefer (blue, red, pastel, etc.)</li>
+                      <li>Styles (geometric, organic, abstract)</li>
+                      <li>Adjectives (flowing, minimalist, vintage)</li>
+                    </ul>
+                  </div>
+                  
+                  <div>
+                    <h4 className="text-lg font-semibold text-gray-900 mb-2 flex items-center">
+                      <SafeIcon icon={FiTarget} className="w-5 h-5 mr-2 text-green-500" />
+                      Object Recognition
+                    </h4>
+                    <p className="text-gray-700">
+                      The generator recognizes specific objects mentioned in your prompt. Try mentioning:
+                    </p>
+                    <div className="grid grid-cols-2 gap-4 mt-3">
+                      <div className="bg-gray-50 p-3 rounded-lg">
+                        <div className="font-medium text-gray-800">Teapots</div>
+                        <div className="text-sm text-gray-600">teapot, kettle, brew, tea</div>
+                      </div>
+                      <div className="bg-gray-50 p-3 rounded-lg">
+                        <div className="font-medium text-gray-800">Coffee Cups</div>
+                        <div className="text-sm text-gray-600">coffee, cup, mug, cafe</div>
+                      </div>
+                      <div className="bg-gray-50 p-3 rounded-lg">
+                        <div className="font-medium text-gray-800">Leaves</div>
+                        <div className="text-sm text-gray-600">leaf, nature, plant, botanical</div>
+                      </div>
+                      <div className="bg-gray-50 p-3 rounded-lg">
+                        <div className="font-medium text-gray-800">Other Objects</div>
+                        <div className="text-sm text-gray-600">stars, hearts, flowers</div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h4 className="text-lg font-semibold text-gray-900 mb-2 flex items-center">
+                      <SafeIcon icon={FiSliders} className="w-5 h-5 mr-2 text-purple-500" />
+                      Fine-Tuning
+                    </h4>
+                    <p className="text-gray-700">
+                      After generating a pattern, use the controls to adjust:
+                    </p>
+                    <ul className="list-disc pl-6 text-gray-600 space-y-1">
+                      <li>Style (geometric, organic, abstract)</li>
+                      <li>Complexity and scale</li>
+                      <li>Rotation and randomness</li>
+                      <li>Color palette</li>
+                      <li>Toggle objects on/off</li>
+                    </ul>
+                  </div>
+                  
+                  <div>
+                    <h4 className="text-lg font-semibold text-gray-900 mb-2 flex items-center">
+                      <SafeIcon icon={FiDownload} className="w-5 h-5 mr-2 text-blue-500" />
+                      Example Prompts
+                    </h4>
+                    <div className="space-y-2">
+                      <div className="bg-gray-50 p-3 rounded-lg">
+                        <div className="text-primary-600 font-medium">Teapot pattern with blue and gold accents</div>
+                      </div>
+                      <div className="bg-gray-50 p-3 rounded-lg">
+                        <div className="text-primary-600 font-medium">Vintage teapot collection in pastel colors</div>
+                      </div>
+                      <div className="bg-gray-50 p-3 rounded-lg">
+                        <div className="text-primary-600 font-medium">Abstract coffee cups with vibrant red background</div>
+                      </div>
+                      <div className="bg-gray-50 p-3 rounded-lg">
+                        <div className="text-primary-600 font-medium">Minimalist teapot line art in monochrome</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-gray-50/50 p-4 border-t border-gray-200/50">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => setShowHelpModal(false)}
+                  className="w-full px-4 py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-lg shadow-neu-button hover:shadow-neu-flat transition-all duration-200"
+                >
+                  Got It
+                </motion.button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      
+      {/* Export Modal */}
+      <AnimatePresence>
+        {showExportModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30 backdrop-blur-md"
+            onClick={() => setShowExportModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              className="relative max-w-lg w-full bg-white/90 backdrop-blur-sm rounded-2xl overflow-hidden shadow-neu-card border border-white/50"
+              onClick={e => e.stopPropagation()}
+            >
+              {/* Modal Header */}
+              <div className="bg-gradient-to-r from-primary-500/10 to-purple-500/10 p-6 border-b border-gray-200/50">
+                <div className="flex items-center">
+                  <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-purple-600 rounded-xl flex items-center justify-center shadow-neu-button mr-4">
+                    <SafeIcon icon={FiDownload} className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold text-gray-900">Export Pattern</h3>
+                    <p className="text-gray-600">Choose your preferred export format</p>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Modal Content */}
+              <div className="p-6 space-y-6">
+                {/* Format Selection */}
+                <div className="grid grid-cols-2 gap-4">
+                  <motion.button
+                    whileHover={{ scale: 1.02, y: -2 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => handleExport('png')}
+                    className="p-4 bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-neu-flat hover:shadow-neu-button border border-gray-200/50 transition-all duration-200"
+                  >
+                    <div className="flex items-center justify-center mb-3">
+                      <div className="w-10 h-10 bg-blue-500/10 rounded-lg flex items-center justify-center">
+                        <SafeIcon icon={FiFileText} className="w-5 h-5 text-blue-500" />
+                      </div>
+                    </div>
+                    <div className="text-center">
+                      <h4 className="font-semibold text-gray-900">PNG Format</h4>
+                      <p className="text-sm text-gray-600">High-quality image</p>
+                    </div>
+                  </motion.button>
+                  
+                  <motion.button
+                    whileHover={{ scale: 1.02, y: -2 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => handleExport('svg')}
+                    className="p-4 bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-neu-flat hover:shadow-neu-button border border-gray-200/50 transition-all duration-200"
+                  >
+                    <div className="flex items-center justify-center mb-3">
+                      <div className="w-10 h-10 bg-purple-500/10 rounded-lg flex items-center justify-center">
+                        <SafeIcon icon={FiFileText} className="w-5 h-5 text-purple-500" />
+                      </div>
+                    </div>
+                    <div className="text-center">
+                      <h4 className="font-semibold text-gray-900">SVG Format</h4>
+                      <p className="text-sm text-gray-600">Scalable vector</p>
+                    </div>
+                  </motion.button>
+                </div>
+                
+                {/* Resolution Settings */}
+                <div className="bg-gray-50/50 rounded-xl p-4 border border-gray-200/50">
+                  <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center">
+                    <SafeIcon icon={FiSettings} className="w-4 h-4 mr-2" />
+                    Export Settings
+                  </h4>
+                  <div className="space-y-3">
+                    <div>
+                      <label className="text-sm text-gray-600">Resolution</label>
+                      <select className="w-full mt-1 px-3 py-2 bg-white rounded-lg shadow-neu-pressed-sm border border-gray-200/50 outline-none">
+                        <option>1024 x 1024 px</option>
+                        <option>2048 x 2048 px</option>
+                        <option>4096 x 4096 px</option>
+                      </select>
                     </div>
                     <div>
-                      <h3 className="text-2xl font-bold text-gray-900">Export Pattern</h3>
-                      <p className="text-gray-600">Choose your preferred export format</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Modal Content */}
-                <div className="p-6 space-y-6">
-                  {/* Format Selection */}
-                  <div className="grid grid-cols-2 gap-4">
-                    <motion.button
-                      whileHover={{ scale: 1.02, y: -2 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => handleExport('png')}
-                      className="p-4 bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-neu-flat hover:shadow-neu-button border border-gray-200/50 transition-all duration-200"
-                    >
-                      <div className="flex items-center justify-center mb-3">
-                        <div className="w-10 h-10 bg-blue-500/10 rounded-lg flex items-center justify-center">
-                          <SafeIcon icon={FiFileText} className="w-5 h-5 text-blue-500" />
-                        </div>
-                      </div>
-                      <div className="text-center">
-                        <h4 className="font-semibold text-gray-900">PNG Format</h4>
-                        <p className="text-sm text-gray-600">High-quality image</p>
-                      </div>
-                    </motion.button>
-
-                    <motion.button
-                      whileHover={{ scale: 1.02, y: -2 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => handleExport('svg')}
-                      className="p-4 bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-neu-flat hover:shadow-neu-button border border-gray-200/50 transition-all duration-200"
-                    >
-                      <div className="flex items-center justify-center mb-3">
-                        <div className="w-10 h-10 bg-purple-500/10 rounded-lg flex items-center justify-center">
-                          <SafeIcon icon={FiFileText} className="w-5 h-5 text-purple-500" />
-                        </div>
-                      </div>
-                      <div className="text-center">
-                        <h4 className="font-semibold text-gray-900">SVG Format</h4>
-                        <p className="text-sm text-gray-600">Scalable vector</p>
-                      </div>
-                    </motion.button>
-                  </div>
-
-                  {/* Resolution Settings */}
-                  <div className="bg-gray-50/50 rounded-xl p-4 border border-gray-200/50">
-                    <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center">
-                      <SafeIcon icon={FiSettings} className="w-4 h-4 mr-2" />
-                      Export Settings
-                    </h4>
-                    <div className="space-y-3">
-                      <div>
-                        <label className="text-sm text-gray-600">Resolution</label>
-                        <select className="w-full mt-1 px-3 py-2 bg-white rounded-lg shadow-neu-pressed-sm border border-gray-200/50 outline-none">
-                          <option>1024 x 1024 px</option>
-                          <option>2048 x 2048 px</option>
-                          <option>4096 x 4096 px</option>
-                        </select>
-                      </div>
-                      <div>
-                        <label className="text-sm text-gray-600">Quality</label>
-                        <div className="relative mt-1">
-                          <input
-                            type="range"
-                            min="1"
-                            max="100"
-                            value="100"
-                            className="w-full h-2 bg-gradient-to-r from-gray-200 to-gray-300 rounded-full appearance-none cursor-pointer"
-                          />
-                          <div className="flex justify-between text-xs text-gray-500 mt-1">
-                            <span>Standard</span>
-                            <span>High</span>
-                          </div>
+                      <label className="text-sm text-gray-600">Quality</label>
+                      <div className="relative mt-1">
+                        <input 
+                          type="range" 
+                          min="1" 
+                          max="100" 
+                          value="100"
+                          className="w-full h-2 bg-gradient-to-r from-gray-200 to-gray-300 rounded-full appearance-none cursor-pointer"
+                        />
+                        <div className="flex justify-between text-xs text-gray-500 mt-1">
+                          <span>Standard</span>
+                          <span>High</span>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
-
-                {/* Modal Footer */}
-                <div className="bg-gray-50/50 p-6 border-t border-gray-200/50">
-                  <div className="flex justify-end space-x-3">
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => setShowExportModal(false)}
-                      className="px-4 py-2 text-gray-700 bg-white rounded-lg shadow-neu-flat hover:shadow-neu-button transition-all duration-200"
-                    >
-                      Cancel
-                    </motion.button>
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={handleDownload}
-                      className="px-4 py-2 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-lg shadow-neu-button hover:shadow-neu-flat transition-all duration-200"
-                    >
-                      Export Pattern
-                    </motion.button>
-                  </div>
+              </div>
+              
+              {/* Modal Footer */}
+              <div className="bg-gray-50/50 p-6 border-t border-gray-200/50">
+                <div className="flex justify-end space-x-3">
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => setShowExportModal(false)}
+                    className="px-4 py-2 text-gray-700 bg-white rounded-lg shadow-neu-flat hover:shadow-neu-button transition-all duration-200"
+                  >
+                    Cancel
+                  </motion.button>
+                  
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={handleDownload}
+                    className="px-4 py-2 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-lg shadow-neu-button hover:shadow-neu-flat transition-all duration-200"
+                  >
+                    Export Pattern
+                  </motion.button>
                 </div>
-              </motion.div>
+              </div>
             </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
